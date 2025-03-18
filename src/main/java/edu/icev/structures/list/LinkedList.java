@@ -45,26 +45,35 @@ public class LinkedList<TYPE> {
         this.size++;
     }
 
+    public void addStart(TYPE newValue){
+        No<TYPE> newNo = new No<TYPE>(newValue);
+        if (this.first == null && this.last == null){
+            this.first = newNo;
+            this.last = newNo;
+        }else{
+            newNo.setNext(this.first);
+            this.first = newNo;
+        }
+        this.size++;
+    }
+
     public void remove(TYPE searchValue){
+        if (this.first == null) return;
+
         No<TYPE> previous = null;
         No<TYPE> current = this.first;
-        for (int i=0; i < this.getSize(); i++){
+
+        while (current != null){
             if (current.getValue().equals(searchValue)){
-                if (this.size == 1) {
-                    this.first = null;
-                    this.last = null;
-                } else if (current == first) {
-                    this.first = first.getNext();
-                    current.setNext(null);
-                } else if (current == last) {
-                    this.last = previous;
-                    previous.setNext(null);
+                if (current == first){
+                    first = first.getNext();
+                    if (first == null) last = null;
                 } else {
                     previous.setNext(current.getNext());
-                    current = null;
+                    if (current == last) last = previous;
                 }
                 this.size--;
-                break;
+                return;
             }
             previous = current;
             current = current.getNext();
@@ -80,4 +89,5 @@ public class LinkedList<TYPE> {
         }
         return current;
     }
+
 }
