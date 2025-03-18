@@ -1,27 +1,27 @@
 package edu.icev.structures.list;
 
-public class LinkedList {
-    private No first;
-    private No last;
+public class LinkedList<TYPE> {
+    private No<TYPE> first;
+    private No<TYPE> last;
     private int size;
 
     public LinkedList (){
         this.size = 0;
     }
 
-    public No getFirst() {
+    public No<TYPE> getFirst() {
         return first;
     }
 
-    public void setFirst(No first) {
+    public void setFirst(No<TYPE> first) {
         this.first = first;
     }
 
-    public No getLast() {
+    public No<TYPE> getLast() {
         return last;
     }
 
-    public void setLast(No last) {
+    public void setLast(No<TYPE> last) {
         this.last = last;
     }
 
@@ -33,8 +33,8 @@ public class LinkedList {
         this.size = size;
     }
 
-    public void add(String newValue){
-        No newNo = new No(newValue);
+    public void add(TYPE newValue){
+        No<TYPE> newNo = new No<TYPE>(newValue);
         if (this.first == null && this.last == null){
             this.first = newNo;
             this.last = newNo;
@@ -45,11 +45,11 @@ public class LinkedList {
         this.size++;
     }
 
-    public void remove(String searchValue){
-        No previous = null;
-        No current = this.first;
+    public void remove(TYPE searchValue){
+        No<TYPE> previous = null;
+        No<TYPE> current = this.first;
         for (int i=0; i < this.getSize(); i++){
-            if (current.getValue().equalsIgnoreCase(searchValue)){
+            if (current.getValue().equals(searchValue)){
                 if (this.size == 1) {
                     this.first = null;
                     this.last = null;
@@ -71,8 +71,8 @@ public class LinkedList {
         }
     }
 
-    public No get(int pos){
-        No  current = this.first;
+    public No<TYPE> get(int pos){
+        No<TYPE>  current = this.first;
         for (int i=0; i <pos; i++){
             if (current.getNext() !=null){
                 current = current.getNext();
