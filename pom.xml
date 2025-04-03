@@ -8,10 +8,10 @@
 		<version>3.4.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>edu.icev</groupId>
-	<artifactId>TeresinaCollectionSim</artifactId>
+	<groupId>edu</groupId>
+	<artifactId>simulator</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>TeresinaCollectionSim</name>
+	<name>simulator</name>
 	<description>Simulador de coleta de lixo</description>
 	<url/>
 	<licenses>

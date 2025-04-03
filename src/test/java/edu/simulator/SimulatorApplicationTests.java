@@ -1,10 +1,10 @@
-package edu.icev.TeresinaCollectionSim;
+package edu.simulator;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class TeresinaCollectionSimApplicationTests {
+class SimulatorApplicationTests {
 
 	@Test
 	void contextLoads() {
