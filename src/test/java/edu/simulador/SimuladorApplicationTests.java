@@ -1,10 +1,10 @@
-package edu.simulator;
+package edu.simulador;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SimulatorApplicationTests {
+class SimuladorApplicationTests {
 
 	@Test
 	void contextLoads() {
