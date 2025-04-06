@@ -20,6 +20,7 @@ public class Simulador {
         }
     }
 
+
     public void pausar() {
 
     }
