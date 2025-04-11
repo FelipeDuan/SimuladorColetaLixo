@@ -1,0 +1,54 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+out/
+*.ipr
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Arquivos de build comuns
+/build/
+target/
+bin/
+*.class
+*.log
+
+# Gradle
+.gradle/
+!gradle-wrapper.jar
+build/
+
+# Maven
+target/
+
+# Arquivos de cache
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Arquivos de sistema
+*.tmp
+
+# VSCode (caso use junto)
+.vscode/
+
+# Arquivos de testes temporários
+test-output/
+
+# Arquivos gerados por cobertura de testes
+jacoco.exec
+coverage/
+
+# Outros
+*.jar
+*.war
+*.ear
