@@ -1,54 +1,29 @@
-# IntelliJ IDEA
-.idea/
-*.iml
-*.iws
+### IntelliJ IDEA ###
 out/
-*.ipr
+!**/src/main/**/out/
+!**/src/test/**/out/
 
-# MacOS
-.DS_Store
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Arquivos de build comuns
-/build/
-target/
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
 bin/
-*.class
-*.log
+!**/src/main/**/bin/
+!**/src/test/**/bin/
 
-# Gradle
-.gradle/
-!gradle-wrapper.jar
-build/
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
 
-# Maven
-target/
-
-# Arquivos de cache
-*.swp
-*.swo
-
-# Logs
-*.log
-
-# Arquivos de sistema
-*.tmp
-
-# VSCode (caso use junto)
+### VS Code ###
 .vscode/
 
-# Arquivos de testes temporários
-test-output/
-
-# Arquivos gerados por cobertura de testes
-jacoco.exec
-coverage/
-
-# Outros
-*.jar
-*.war
-*.ear
+### Mac OS ###
+.DS_Store

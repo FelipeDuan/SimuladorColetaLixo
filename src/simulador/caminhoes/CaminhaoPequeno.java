@@ -1,7 +1,8 @@
-package caminhoes;
+package simulador.caminhoes;
 
 public class CaminhaoPequeno {
-    String id;
+
+  String id;
     int capacidadeMaxima;
     int cargaAtual;
     int numeroDeViagensDiarias;
@@ -47,3 +48,4 @@ public class CaminhaoPequeno {
         CaminhaoAnimacoes.caminhaoAndando();
     }
 }
+

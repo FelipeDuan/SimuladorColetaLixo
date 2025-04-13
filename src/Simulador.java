@@ -1,11 +1,12 @@
-import caminhoes.CaminhaoGrande;
-import caminhoes.CaminhaoPequeno;
-import estacoes.EstacaoDeTransferencia;
+import simulador.caminhoes.CaminhaoGrande;
+import simulador.caminhoes.CaminhaoPequeno;
+import simulador.estacoes.EstacaoDeTransferencia;
 
 public class Simulador {
+
+    CaminhaoGrande[] caminhoesGrandes;
     CaminhaoPequeno[] caminhaoPequenos;
-    CaminhaoGrande[] caminhaoGrandes;
-    EstacaoDeTransferencia [] estacaoDeTransferencias;
+    EstacaoDeTransferencia[] estacaoDeTransferencias;
 
     float tempoSimulacao;
     boolean rodando;
@@ -34,4 +35,5 @@ public class Simulador {
     public void gerarEstatisticas() {
 
     }
+
 }

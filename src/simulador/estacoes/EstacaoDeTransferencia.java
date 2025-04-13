@@ -1,4 +1,4 @@
-package estacoes;
+package simulador.estacoes;
 
 public class EstacaoDeTransferencia {
     // Fila de carregamento

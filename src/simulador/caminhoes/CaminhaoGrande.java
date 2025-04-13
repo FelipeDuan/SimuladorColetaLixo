@@ -1,9 +1,4 @@
-package caminhoes;/*
-* - Capacidade fixa de 20 toneladas
-- Tem tolerância de Espera
-    - Se for excedida, parte para o aterro sanitário
-    - Se estiver vazio, aguarda até ser carregado
-* */
+package simulador.caminhoes;
 
 public class CaminhaoGrande {
     public int id;
@@ -40,5 +35,4 @@ public class CaminhaoGrande {
         // esperando o carregamento
         return true;
     }
-
 }

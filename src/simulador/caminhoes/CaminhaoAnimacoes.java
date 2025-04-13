@@ -1,4 +1,4 @@
-package caminhoes;
+package simulador.caminhoes;
 
 public class CaminhaoAnimacoes {
     public static void caminhaoAndando() throws InterruptedException {
@@ -53,5 +53,4 @@ public class CaminhaoAnimacoes {
             }
         }
     }
-
 }

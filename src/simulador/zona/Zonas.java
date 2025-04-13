@@ -1,12 +1,12 @@
-package zona;
+package simulador.zona;
 
 import java.util.Random;
 
-public class ZonaLeste {
+public class Zonas {
     private String nome;
     private int lixoAcumulado;
 
-    public ZonaLeste(String nome) {
+    public Zonas(String nome) {
         this.nome = nome;
         this.lixoAcumulado = 0;
     }
@@ -30,4 +30,5 @@ public class ZonaLeste {
     public String getNome() {
         return nome;
     }
+
 }
