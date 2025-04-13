@@ -13,4 +13,40 @@
 
 Este projeto está licenciado sob a [MIT License](LICENSE).
 
+Ótimo!  
+Vou te mostrar como organizar as pastas e já te dou o esqueleto de código para começar a simulação orientada a eventos 👌
+
+---
+
+## 🗂️ Estrutura de Pastas Atualizada
+
+```
+.
+├── estruturas
+│   ├── Fila.java
+│   ├── Lista.java
+│   └── Nodo.java
+├── Main.java
+├── Simulador.java
+├── simulador
+│   ├── caminhoes
+│   │   ├── CaminhaoAnimacoes.java (opcional)
+│   │   ├── CaminhaoGrande.java
+│   │   └── CaminhaoPequeno.java
+│   ├── configuracao
+│   │   └── ParametrosSimulacao.java
+│   ├── estacoes
+│   │   └── EstacaoDeTransferencia.java
+│   ├── eventos
+│   │   ├── AgendaEventos.java
+│   │   ├── Evento.java
+│   │   ├── EventoColeta.java
+│   │   └── EventoTransferencia.java
+│   ├── estatisticas
+│   │   ├── Estatisticas.java
+│   │   └── Logger.java
+│   └── zona
+│       └── Zonas.java
+```
+
 ---
