@@ -38,6 +38,26 @@ public class ParametrosSimulacao {
     public static final int LIXO_MIN_SUDESTE = 18;
     public static final int LIXO_MAX_SUDESTE = 35;
 
+    // ⏱️ Multiplicador de tempo para horário de pico
+    public static final double MULTIPLICADOR_TEMPO_PICO = 1.5;
+
+    // ⏱️ Multiplicador de tempo para fora de pico
+    public static final double MULTIPLICADOR_TEMPO_FORA_PICO = 1.0;
+
+    // 🕒 Definição de horário de pico (em horas do dia)
+    public static final int HORA_INICIO_PICO_MANHA = 7;
+    public static final int HORA_FIM_PICO_MANHA = 9;
+
+    // 🕒 Intervalo de almoço (caso queira aplicar multiplicador diferente no futuro)
+    public static final int HORA_DE_ALMOÇO = 12;
+    public static final int HORA_DE_ALMOÇO_FIM = 14;
+
+    public static final int HORA_INICIO_PICO_TARDE = 17;
+    public static final int HORA_FIM_PICO_TARDE = 19;
+
+    // ⚙️ Quantidade de lixo coletado por evento de coleta (em toneladas)
+    public static final int QUANTIDADE_COLETA_POR_EVENTO = 2;
+
     // ⏳ Tempo máximo de espera nas estações para caminhões pequenos (minutos)
     public static final int TEMPO_MAX_ESPERA_CAMINHAO_PEQUENO = 15;
 

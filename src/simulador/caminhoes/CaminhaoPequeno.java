@@ -1,5 +1,7 @@
 package simulador.caminhoes;
 
+import simulador.configuracao.ParametrosSimulacao;
+
 public class CaminhaoPequeno {
 
     private String id;
@@ -53,14 +55,33 @@ public class CaminhaoPequeno {
         return numeroDeViagensDiarias > 0;
     }
 
-    public int calcularTempoViagem() {
-        // Simula o tempo de viagem entre 5 a 15 minutos, ajustável depois pelos parâmetros
-        return (int) (Math.random() * 10 + 5);
+    public int calcularTempoViagem(int tempoAtualSimulacaoMinutos) {
+        boolean horarioDePico = verificarHorarioDePico(tempoAtualSimulacaoMinutos);
+
+        int tempoMin = horarioDePico ? ParametrosSimulacao.TEMPO_MIN_PICO : ParametrosSimulacao.TEMPO_MIN_FORA_PICO;
+        int tempoMax = horarioDePico ? ParametrosSimulacao.TEMPO_MAX_PICO : ParametrosSimulacao.TEMPO_MAX_FORA_PICO;
+
+        int tempoBase = (int) (Math.random() * (tempoMax - tempoMin + 1)) + tempoMin;
+
+        double multiplicador = horarioDePico ? ParametrosSimulacao.MULTIPLICADOR_TEMPO_PICO : ParametrosSimulacao.MULTIPLICADOR_TEMPO_FORA_PICO;
+
+        int tempoFinal = (int) (tempoBase * multiplicador);
+
+        System.out.println("Caminhão " + id + " tempo de viagem calculado: " + tempoFinal + " minutos. (Multiplicador: " + multiplicador + ")");
+        return tempoFinal;
     }
 
     public void registrarViagem() {
         if (numeroDeViagensDiarias > 0) {
             numeroDeViagensDiarias--;
+            System.out.println("Caminhão " + id + " registrou uma viagem. Viagens restantes: " + numeroDeViagensDiarias);
         }
+    }
+
+    private boolean verificarHorarioDePico(int tempoAtualMinutos) {
+        int hora = tempoAtualMinutos / 60;
+
+        return (hora >= ParametrosSimulacao.HORA_INICIO_PICO_MANHA && hora <= ParametrosSimulacao.HORA_FIM_PICO_MANHA)
+            || (hora >= ParametrosSimulacao.HORA_INICIO_PICO_TARDE && hora <= ParametrosSimulacao.HORA_FIM_PICO_TARDE);
     }
 }
