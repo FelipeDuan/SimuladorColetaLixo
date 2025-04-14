@@ -1,69 +1,135 @@
 package estruturas.lista;
 
+import java.util.Comparator;
+
+/**
+ * Implementação de uma lista duplamente encadeada genérica.
+ *
+ * @param <T> o tipo dos elementos armazenados na lista
+ */
 public class Lista<T> {
     private No<T> head;
     private No<T> tail;
     private int tamanho;
 
+    /**
+     * Constrói uma lista vazia.
+     */
     public Lista() {
         head = null;
         tail = null;
         tamanho = 0;
     }
 
+    // ========== OPERAÇÕES BÁSICAS ==========
+
     /**
-     * Adiciona um elemento na posição especificada
-     * @param pos Posição onde o elemento será inserido (0-based)
-     * @param valor Valor a ser inserido
+     * Adiciona um elemento na posição especificada.
+     *
+     * @param pos a posição onde o elemento será inserido (0-based)
+     * @param valor o valor a ser inserido
      * @return true se a inserção foi bem-sucedida, false caso contrário
+     * @throws IndexOutOfBoundsException se a posição for inválida (negativa ou maior que o tamanho)
      */
     public boolean adicionar(int pos, T valor) {
         if (pos < 0 || pos > tamanho) {
-            return false;
+            throw new IndexOutOfBoundsException("Posição inválida: " + pos);
         }
 
         No<T> novo = new No<>(valor);
 
-        if (tamanho == 0) {  // Lista vazia
-            head = novo;
-            tail = novo;
-        } else if (pos == 0) {  // Inserção no início
-            novo.setProx(head);
-            head.setPrev(novo);
-            head = novo;
-        } else if (pos == tamanho) {  // Inserção no final
-            novo.setPrev(tail);
+        if (pos == 0) {
+            if (head == null) {
+                head = novo;
+                tail = novo;
+            } else {
+                novo.setProx(head);
+                head.setPrev(novo);
+                head = novo;
+            }
+        } else if (pos == tamanho) {
             tail.setProx(novo);
+            novo.setPrev(tail);
             tail = novo;
-        } else {  // Inserção no meio
-            No<T> atual = getNo(pos - 1);
+        } else {
+            No<T> atual = head;
+            for (int i = 0; i < pos - 1; i++) {
+                atual = atual.getProx();
+            }
             novo.setProx(atual.getProx());
-            novo.setPrev(atual);
-            atual.getProx().setPrev(novo);
             atual.setProx(novo);
+            novo.getProx().setPrev(novo);
+            novo.setPrev(atual);
         }
         tamanho++;
         return true;
     }
 
     /**
-     * Remove o elemento na posição especificada
-     * @param pos Posição do elemento a ser removido (0-based)
-     * @return true se a remoção foi bem-sucedida, false caso contrário
+     * Adiciona um elemento na lista mantendo a ordem definida pelo comparador.
+     *
+     * @param elemento o elemento a ser adicionado
+     * @param comparador o comparador para definir a ordem
+     * @throws IllegalArgumentException se elemento ou comparador forem nulos
      */
-    public T removerHead() {
-    if (head == null){
-        return null;
-    }
-    T valor = head.getValor();
-    head = head.getProx();
-    tamanho--;
-    return valor;
+    public void adicionarOrdenado(T elemento, Comparator<T> comparador) {
+        if (elemento == null || comparador == null) {
+            throw new IllegalArgumentException("Elemento e comparador não podem ser nulos");
+        }
+
+        // Caso especial: lista vazia ou inserção no início
+        if (head == null || comparador.compare(elemento, head.getValor()) <= 0) {
+            adicionar(0, elemento);
+            return;
+        }
+
+        // Caso especial: inserção no final
+        if (comparador.compare(elemento, tail.getValor()) >= 0) {
+            adicionar(tamanho, elemento);
+            return;
+        }
+
+        // Procura a posição correta no meio da lista
+        No<T> atual = head;
+        int pos = 0;
+        while (atual != null && comparador.compare(elemento, atual.getValor()) > 0) {
+            atual = atual.getProx();
+            pos++;
+        }
+
+        adicionar(pos, elemento);
     }
 
-        public boolean remover(int pos) {
+    /**
+     * Remove e retorna o elemento no início da lista.
+     *
+     * @return o elemento removido, ou null se a lista estiver vazia
+     */
+    public T removerHead() {
+        if (head == null) {
+            return null;
+        }
+        T valor = head.getValor();
+        head = head.getProx();
+        if (head != null) {
+            head.setPrev(null);
+        } else {
+            tail = null; // Lista ficou vazia
+        }
+        tamanho--;
+        return valor;
+    }
+
+    /**
+     * Remove o elemento na posição especificada.
+     *
+     * @param pos a posição do elemento a ser removido (0-based)
+     * @return true se a remoção foi bem-sucedida, false caso contrário
+     * @throws IndexOutOfBoundsException se a posição for inválida (negativa ou maior/igual ao tamanho)
+     */
+    public boolean remover(int pos) {
         if (pos < 0 || pos >= tamanho || head == null) {
-            return false;
+            throw new IndexOutOfBoundsException("Posição inválida: " + pos);
         }
 
         if (tamanho == 1) {  // Único elemento
@@ -84,11 +150,13 @@ public class Lista<T> {
         return true;
     }
 
+    // ========== MÉTODOS DE CONSULTA ==========
 
     /**
-     * Obtém o nó na posição especificada
-     * @param pos Posição do nó (0-based)
-     * @return Nó na posição especificada
+     * Retorna o nó na posição especificada.
+     *
+     * @param pos a posição do nó (0-based)
+     * @return o nó na posição especificada, ou null se a posição for inválida
      */
     private No<T> getNo(int pos) {
         if (pos < 0 || pos >= tamanho) {
@@ -96,7 +164,7 @@ public class Lista<T> {
         }
 
         No<T> atual;
-        // Decide começar do início ou do fim para melhor performance
+        // Otimização: decide começar do início ou do fim para melhor performance
         if (pos < tamanho / 2) {
             atual = head;
             for (int i = 0; i < pos; i++) {
@@ -112,7 +180,36 @@ public class Lista<T> {
     }
 
     /**
-     * Imprime todos os elementos da lista do início ao fim
+     * Retorna o primeiro nó da lista (cabeça).
+     *
+     * @return o primeiro nó da lista, ou null se a lista estiver vazia
+     */
+    public No<T> espiarPrimeiro() {
+        return head;
+    }
+
+    /**
+     * Retorna o tamanho atual da lista.
+     *
+     * @return o número de elementos na lista
+     */
+    public int getTamanho() {
+        return tamanho;
+    }
+
+    /**
+     * Verifica se a lista está vazia.
+     *
+     * @return true se a lista estiver vazia, false caso contrário
+     */
+    public boolean estaVazia() {
+        return tamanho == 0;
+    }
+
+    // ========== MÉTODOS DE VISUALIZAÇÃO ==========
+
+    /**
+     * Imprime todos os elementos da lista do início ao fim.
      */
     public void imprimir() {
         No<T> atual = head;
@@ -124,7 +221,7 @@ public class Lista<T> {
     }
 
     /**
-     * Imprime todos os elementos da lista do fim ao início
+     * Imprime todos os elementos da lista do fim ao início.
      */
     public void imprimirReverso() {
         No<T> atual = tail;
@@ -133,21 +230,5 @@ public class Lista<T> {
             atual = atual.getPrev();
         }
         System.out.println("-> NULL");
-    }
-
-    /**
-     * Retorna o tamanho atual da lista
-     * @return número de elementos na lista
-     */
-    public int getTamanho() {
-        return tamanho;
-    }
-
-    /**
-     * Verifica se a lista está vazia
-     * @return true se a lista estiver vazia, false caso contrário
-     */
-    public boolean estaVazia() {
-        return tamanho == 0;
     }
 }
