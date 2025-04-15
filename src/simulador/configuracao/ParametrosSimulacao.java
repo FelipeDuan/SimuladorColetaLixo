@@ -12,12 +12,12 @@ public class ParametrosSimulacao {
     public static final int CAMINHAO_GRANDE_20T = 20;
 
     // ⏱️ Intervalo de tempo para viagens (em minutos) - horário de pico
-    public static final int TEMPO_MIN_PICO = 5;
-    public static final int TEMPO_MAX_PICO = 10;
+public static final int TEMPO_MIN_PICO = 30; // 30 min
+public static final int TEMPO_MAX_PICO = 60;
 
     // ⏱️ Intervalo de tempo para viagens (em minutos) - fora de pico
-    public static final int TEMPO_MIN_FORA_PICO = 3;
-    public static final int TEMPO_MAX_FORA_PICO = 7;
+    public static final int TEMPO_MIN_FORA_PICO = 20;
+    public static final int TEMPO_MAX_FORA_PICO = 40;
 
     // 🚛 Número máximo de viagens diárias para cada caminhão pequeno
     public static final int MAX_VIAGENS_DIARIAS_CAMINHAO_PEQUENO = 3;
@@ -69,6 +69,11 @@ public class ParametrosSimulacao {
 
     // 👥 Número de estações de transferência
     public static final int NUM_ESTACOES_TRANSFERENCIA = 2;
+
+    public static boolean isHorarioDePico(int hora) {
+    return (hora >= HORA_INICIO_PICO_MANHA && hora < HORA_FIM_PICO_MANHA)
+        || (hora >= HORA_INICIO_PICO_TARDE && hora < HORA_FIM_PICO_TARDE);
+}
 
     private ParametrosSimulacao() {
         // Construtor privado para evitar instância
