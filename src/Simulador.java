@@ -4,6 +4,7 @@ import simulador.configuracao.ParametrosSimulacao;
 import simulador.estacoes.EstacaoDeTransferencia;
 import simulador.eventos.AgendaEventos;
 import simulador.eventos.EventoColeta;
+import simulador.util.TempoUtil;
 
 public class Simulador {
 
@@ -22,17 +23,23 @@ public class Simulador {
     public void iniciarSimulacao() {
         System.out.println("Iniciando simulação de coleta de lixo em Teresina...");
 
-        CaminhaoPequeno caminhao1 = new CaminhaoPequeno("1", 4, 3); // id 1, capacidade 4 ton, 3 viagens
+        CaminhaoPequeno caminhao1 = new CaminhaoPequeno("1", 8, 3); // id 1, capacidade 4 ton, 3 viagens
 
         AgendaEventos.adicionarEvento(new EventoColeta(0, caminhao1));
 
         AgendaEventos.processarEventos();
 
-        System.out.println("Simulação finalizada.");
         System.out.println();
-        System.out.println("Parâmetros da Simulação:");
-        System.out.println("Capacidade caminhão grande: " + ParametrosSimulacao.CAMINHAO_GRANDE_20T + " toneladas");
-        System.out.println("Tempo máximo de espera caminhão pequeno: " + ParametrosSimulacao.TEMPO_MAX_ESPERA_CAMINHAO_PEQUENO + " minutos");
+        int tempoFinal = AgendaEventos.getTempoUltimoEvento();
+        System.out.println("[Tempo Final] Simulação encerrada às " + TempoUtil.converterMinutoParaHora(tempoFinal));
+
+
+        System.out.println();
+        System.out.println("============================================");
+        System.out.println("Simulação finalizada com sucesso!");
+        System.out.println("Tempo total de simulação: " + TempoUtil.converterMinutoParaHora(AgendaEventos.getTempoUltimoEvento()));
+        System.out.println("Caminhões rodaram, lixo coletado, missão cumprida!");
+        System.out.println("============================================");
     }
 
     public void continuar() {

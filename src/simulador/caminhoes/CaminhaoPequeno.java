@@ -78,6 +78,10 @@ public class CaminhaoPequeno {
         }
     }
 
+    public int getNumeroDeViagensRestantes() {
+        return numeroDeViagensDiarias;
+    }
+
     private boolean verificarHorarioDePico(int tempoAtualMinutos) {
         int hora = tempoAtualMinutos / 60;
 

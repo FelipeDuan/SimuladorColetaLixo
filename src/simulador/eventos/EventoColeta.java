@@ -4,14 +4,50 @@ import simulador.caminhoes.CaminhaoPequeno;
 import simulador.configuracao.ParametrosSimulacao;
 import simulador.util.TempoUtil;
 
-public class EventoColeta extends Evento {
-    private CaminhaoPequeno caminhao;
+/**
+ * Representa um evento de coleta de lixo realizado por um caminhão pequeno no simulador.
+ * <p>
+ * Este evento é responsável por:
+ * <ul>
+ *   <li>Executar a operação de coleta</li>
+ *   <li>Controlar o número de viagens realizadas</li>
+ *   <li>Gerenciar a transição para o próximo estado (nova coleta ou retorno à estação)</li>
+ * </ul>
+ *
+ * @see Evento
+ * @see CaminhaoPequeno
+ */
+    public class EventoColeta extends Evento {
+        private CaminhaoPequeno caminhao;
 
-    public EventoColeta(int tempo, CaminhaoPequeno caminhao) {
-        super(tempo);
-        this.caminhao = caminhao;
-    }
+        /**
+         * Constrói um novo Evento de Coleta.
+         *
+         * @param tempo O tempo em minutos quando o evento ocorrerá
+         * @param caminhao O caminhão pequeno que realizará a coleta
+         */
+        public EventoColeta(int tempo, CaminhaoPequeno caminhao) {
+            super(tempo);
+            this.caminhao = caminhao;
+        }
 
+    /**
+     * Executa as ações do evento de coleta:
+     * <ol>
+     *   <li>Exibe informações iniciais</li>
+     *   <li>Tenta realizar a coleta</li>
+     *   <li>Registra a viagem realizada</li>
+     *   <li>Decide e agenda o próximo evento (nova coleta ou retorno à estação)</li>
+     * </ol>
+     * <p>
+     * O próximo evento é determinado com base na capacidade do caminhão e no número
+     * de viagens restantes.
+     *
+     * @see ParametrosSimulacao#QUANTIDADE_COLETA_POR_EVENTO
+     * @see ParametrosSimulacao#TEMPO_MIN_FORA_PICO
+     * @see ParametrosSimulacao#TEMPO_MAX_FORA_PICO
+     * @see TempoUtil#calcularTempoRealDeViagem(int, int)
+     */
     @Override
     public void executar() {
         System.out.println("==================================================");
@@ -41,5 +77,6 @@ public class EventoColeta extends Evento {
             System.out.println("[Status] Caminhão " + caminhao.getId() + " encerrando jornada e indo para estação.");
             AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tempo + 1, caminhao));
         }
+        System.out.println();
     }
 }

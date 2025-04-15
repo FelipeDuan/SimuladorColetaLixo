@@ -1,80 +1,111 @@
 package simulador.configuracao;
 
+/**
+ * Classe contendo todos os parâmetros de configuração para a simulação.
+ * <p>
+ * Esta classe centraliza todas as constantes utilizadas no sistema de simulação,
+ * organizadas em categorias lógicas para fácil manutenção e ajuste.
+ * <p>
+ * Padrão de implementação: Singleton (todos os membros são estáticos e finais)
+ */
 public class ParametrosSimulacao {
 
-    // 🔢 Capacidades dos caminhões pequenos
+    // ==================== CAPACIDADES DE CAMINHÕES ====================
+    /** Capacidades em toneladas para caminhões pequenos */
     public static final int CAMINHAO_PEQUENO_2T = 2;
     public static final int CAMINHAO_PEQUENO_4T = 4;
     public static final int CAMINHAO_PEQUENO_8T = 8;
     public static final int CAMINHAO_PEQUENO_10T = 10;
 
-    // 🔢 Capacidade do caminhão grande
+    /** Capacidade em toneladas para caminhão grande */
     public static final int CAMINHAO_GRANDE_20T = 20;
 
-    // ⏱️ Intervalo de tempo para viagens (em minutos) - horário de pico
-public static final int TEMPO_MIN_PICO = 30; // 30 min
-public static final int TEMPO_MAX_PICO = 60;
+    // ==================== TEMPOS DE OPERAÇÃO ====================
+    /** Tempo médio para descarregar por tonelada (em minutos) */
+    public static final int TEMPO_DESCARGA_POR_TONELADA = 5;
 
-    // ⏱️ Intervalo de tempo para viagens (em minutos) - fora de pico
+    /** Tempo médio para carregar por tonelada (em minutos) */
+    public static final int TEMPO_CARREGAMENTO_POR_TONELADA = 6;
+
+    /** Tempo máximo de espera nas estações para caminhões pequenos (minutos) */
+    public static final int TEMPO_MAX_ESPERA_CAMINHAO_PEQUENO = 15;
+
+    /** Tolerância de espera para caminhões grandes (minutos) */
+    public static final int TOLERANCIA_ESPERA_CAMINHAO_GRANDE = 20;
+
+    // ==================== CONFIGURAÇÕES DE VIAGEM ====================
+    /** Intervalo de tempo mínimo para viagens em horário de pico (minutos) */
+    public static final int TEMPO_MIN_PICO = 30;
+
+    /** Intervalo de tempo máximo para viagens em horário de pico (minutos) */
+    public static final int TEMPO_MAX_PICO = 60;
+
+    /** Intervalo de tempo mínimo para viagens fora de pico (minutos) */
     public static final int TEMPO_MIN_FORA_PICO = 20;
+
+    /** Intervalo de tempo máximo para viagens fora de pico (minutos) */
     public static final int TEMPO_MAX_FORA_PICO = 40;
 
-    // 🚛 Número máximo de viagens diárias para cada caminhão pequeno
+    /** Número máximo de viagens diárias para caminhões pequenos */
     public static final int MAX_VIAGENS_DIARIAS_CAMINHAO_PEQUENO = 3;
 
-    // ♻️ Intervalos para geração de lixo por zona (em toneladas por dia)
+    // ==================== GERAÇÃO DE LIXO POR ZONA ====================
+    /** Intervalos de geração de lixo por zona (em toneladas por dia) */
     public static final int LIXO_MIN_SUL = 20;
     public static final int LIXO_MAX_SUL = 40;
-
     public static final int LIXO_MIN_NORTE = 15;
     public static final int LIXO_MAX_NORTE = 30;
-
     public static final int LIXO_MIN_CENTRO = 10;
     public static final int LIXO_MAX_CENTRO = 20;
-
     public static final int LIXO_MIN_LESTE = 15;
     public static final int LIXO_MAX_LESTE = 25;
-
     public static final int LIXO_MIN_SUDESTE = 18;
     public static final int LIXO_MAX_SUDESTE = 35;
 
-    // ⏱️ Multiplicador de tempo para horário de pico
+    // ==================== MULTIPLICADORES DE TEMPO ====================
+    /** Multiplicador de tempo para horário de pico */
     public static final double MULTIPLICADOR_TEMPO_PICO = 1.5;
 
-    // ⏱️ Multiplicador de tempo para fora de pico
+    /** Multiplicador de tempo para fora de pico */
     public static final double MULTIPLICADOR_TEMPO_FORA_PICO = 1.0;
 
-    // 🕒 Definição de horário de pico (em horas do dia)
+    // ==================== HORÁRIOS OPERACIONAIS ====================
+    /** Definições de horário de pico (em horas do dia) */
     public static final int HORA_INICIO_PICO_MANHA = 7;
     public static final int HORA_FIM_PICO_MANHA = 9;
-
-    // 🕒 Intervalo de almoço (caso queira aplicar multiplicador diferente no futuro)
-    public static final int HORA_DE_ALMOÇO = 12;
-    public static final int HORA_DE_ALMOÇO_FIM = 14;
-
     public static final int HORA_INICIO_PICO_TARDE = 17;
     public static final int HORA_FIM_PICO_TARDE = 19;
 
-    // ⚙️ Quantidade de lixo coletado por evento de coleta (em toneladas)
+    /** Intervalo de almoço (em horas do dia) */
+    public static final int HORA_DE_ALMOÇO = 12;
+    public static final int HORA_DE_ALMOÇO_FIM = 14;
+
+    // ==================== PARÂMETROS DE SIMULAÇÃO ====================
+    /** Quantidade de lixo coletado por evento de coleta (em toneladas) */
     public static final int QUANTIDADE_COLETA_POR_EVENTO = 2;
 
-    // ⏳ Tempo máximo de espera nas estações para caminhões pequenos (minutos)
-    public static final int TEMPO_MAX_ESPERA_CAMINHAO_PEQUENO = 15;
+    /** Duração total da simulação em minutos (24 horas) */
+    public static final int DURACAO_SIMULACAO_MINUTOS = 1440;
 
-    // ⏳ Tolerância de espera para caminhões grandes (minutos)
-    public static final int TOLERANCIA_ESPERA_CAMINHAO_GRANDE = 20;
-
-    // 🎛️ Outras configurações úteis
-    public static final int DURACAO_SIMULACAO_MINUTOS = 1440; // 24h
-
-    // 👥 Número de estações de transferência
+    /** Número de estações de transferência */
     public static final int NUM_ESTACOES_TRANSFERENCIA = 2;
 
+    /**
+     * Verifica se um determinado horário está dentro do período de pico.
+     *
+     * @param hora A hora do dia a ser verificada (formato 24h)
+     * @return true se estiver no horário de pico, false caso contrário
+     */
     public static boolean isHorarioDePico(int hora) {
-    return (hora >= HORA_INICIO_PICO_MANHA && hora < HORA_FIM_PICO_MANHA)
-        || (hora >= HORA_INICIO_PICO_TARDE && hora < HORA_FIM_PICO_TARDE);
-}
+        return (hora >= HORA_INICIO_PICO_MANHA && hora < HORA_FIM_PICO_MANHA)
+            || (hora >= HORA_INICIO_PICO_TARDE && hora < HORA_FIM_PICO_TARDE);
+    }
 
+    /**
+     * Construtor privado para evitar instanciação.
+     * <p>
+     * Esta classe é um utilitário com apenas membros estáticos.
+     */
     private ParametrosSimulacao() {
         // Construtor privado para evitar instância
     }
