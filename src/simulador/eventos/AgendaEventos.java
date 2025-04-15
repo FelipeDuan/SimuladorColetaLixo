@@ -4,7 +4,7 @@ import estruturas.lista.Lista;
 
 public class AgendaEventos {
     private static Lista<Evento> eventos = new Lista<>();
-
+    private static int tempoUltimoEvento = 0;
     /**
      * Adiciona um novo evento à agenda, mantendo a ordem pelo tempo do evento
      * @param evento O evento a ser agendado
@@ -28,8 +28,13 @@ public class AgendaEventos {
     public static void processarEventos() {
         while (temEventos()) {
             Evento evento = eventos.removerHead();
+            tempoUltimoEvento = evento.getTempo();
             evento.executar();
         }
+    }
+
+    public static int getTempoUltimoEvento() {
+        return tempoUltimoEvento;
     }
 
     /**
@@ -39,4 +44,6 @@ public class AgendaEventos {
     public static boolean temEventos() {
         return !eventos.estaVazia();
     }
+
+
 }
