@@ -24,9 +24,9 @@ public class TempoUtil {
             throw new IllegalArgumentException("Minutos não podem ser negativos");
         }
 
-        int hora = 7 + (minutos / 60); // simulação inicia 07:00
+        int hora =  minutos / 60;
         int minuto = minutos % 60;
-        return String.format("%02d:%02d", hora, minuto);
+        return String.format("%02d:%02d:00", hora, minuto);
     }
 
     /**

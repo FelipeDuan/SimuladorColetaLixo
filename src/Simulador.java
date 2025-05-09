@@ -31,13 +31,14 @@ public class Simulador {
 
         System.out.println();
         int tempoFinal = AgendaEventos.getTempoUltimoEvento();
-        System.out.println("[Tempo Final] Simulação encerrada às " + TempoUtil.converterMinutoParaHora(tempoFinal));
+        int horaDia = tempoFinal + 420;
 
 
         System.out.println();
         System.out.println("============================================");
         System.out.println("Simulação finalizada com sucesso!");
         System.out.println("Tempo total de simulação: " + TempoUtil.converterMinutoParaHora(AgendaEventos.getTempoUltimoEvento()));
+        System.out.println("[Tempo Final] Simulação encerrada às " + TempoUtil.converterMinutoParaHora(horaDia));
         System.out.println("Caminhões rodaram, lixo coletado, missão cumprida!");
         System.out.println("============================================");
     }
