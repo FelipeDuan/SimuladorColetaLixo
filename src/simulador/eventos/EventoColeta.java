@@ -51,17 +51,9 @@ import simulador.util.TempoUtil;
     @Override
     public void executar() {
         System.out.println("==================================================");
-        System.out.println("TEMPO SIMULADO: " + TempoUtil.converterMinutoParaHora(tempo));
-        System.out.println("[Coleta] Caminhão " + caminhao.getId());
+        System.out.println("[COLETA] CAMINHÃO " + caminhao.getId());
 
         boolean coletou = caminhao.coletar(ParametrosSimulacao.QUANTIDADE_COLETA_POR_EVENTO);
-
-        if (!coletou) {
-            System.out.println("[Coleta] Carga máxima atingida. Encerrando coletas.");
-        }
-
-        caminhao.registrarViagem();
-        System.out.println("[Viagens] Restam " + caminhao.getNumeroDeViagensRestantes() + " viagens.");
 
         if (caminhao.podeRealizarNovaViagem() && coletou) {
             int tempoBase = (int) (Math.random() *
@@ -70,10 +62,14 @@ import simulador.util.TempoUtil;
 
             int tempoReal = TempoUtil.calcularTempoRealDeViagem(tempo, tempoBase);
 
-            System.out.println("[Viagem] Tempo base: " + tempoBase + " min | Tempo real ajustado: " + tempoReal + " min");
+            System.out.println("TEMPO DE TRAJETO: " + TempoUtil.converterMinutoParaHora(tempoReal));
+
+            int HoraDoDia = AgendaEventos.getTempoUltimoEvento() + tempoReal + 420;
+            System.out.println("[" + TempoUtil.converterMinutoParaHora(HoraDoDia)+ "]");
 
             AgendaEventos.adicionarEvento(new EventoColeta(tempo + tempoReal, caminhao));
         } else {
+            System.out.println();
             System.out.println("[Status] Caminhão " + caminhao.getId() + " encerrando jornada e indo para estação.");
             AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tempo + 1, caminhao));
         }

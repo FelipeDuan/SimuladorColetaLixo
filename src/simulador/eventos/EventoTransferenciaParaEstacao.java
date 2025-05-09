@@ -3,6 +3,7 @@ package simulador.eventos;
 import simulador.caminhoes.CaminhaoPequeno;
 import simulador.estacoes.EstacaoDeTransferencia;
 import simulador.configuracao.ParametrosSimulacao;
+import simulador.util.TempoUtil;
 
 public class EventoTransferenciaParaEstacao extends Evento {
     private CaminhaoPequeno caminhao;
@@ -14,12 +15,18 @@ public class EventoTransferenciaParaEstacao extends Evento {
 
     @Override
     public void executar() {
-        System.out.println("Tempo " + tempo + ": Caminhão " + caminhao.getId() + " indo para estação de transferência.");
+        int tempoFinal = AgendaEventos.getTempoUltimoEvento() + 420;
+        String horaDia =  TempoUtil.converterMinutoParaHora(tempoFinal);
 
-        caminhao.viajarPara("Estação de Transferência"); // animação e atualização de zona
+        System.out.println("[" + horaDia + "]");
+        System.out.println("[CAMINHÃO " + caminhao.getId() + "] chegando na estação de transferência.");
+
+//        caminhao.viajarPara("Estação de Transferência"); // animação e atualização de zona
 
         int cargaTransferida = caminhao.descarregar();
+        caminhao.registrarViagem();
 
+        System.out.println();
         EstacaoDeTransferencia.receberCarga(caminhao, cargaTransferida);
 
     }
