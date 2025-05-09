@@ -30,17 +30,18 @@ public class CaminhaoPequeno {
     public boolean coletar(int quantidade) {
         if (cargaAtual + quantidade <= capacidadeMaxima) {
             cargaAtual += quantidade;
-            System.out.println("Caminhão " + id + " coletou " + quantidade + " toneladas. Carga atual: " + cargaAtual + "/" + capacidadeMaxima);
+            System.out.println("[CAMINHÃO " + id +"]" + " Coletou " + quantidade + " toneladas");
+            System.out.println("[CAMINHÃO " + id +"]" + " Carga atual: " + cargaAtual + "/" + capacidadeMaxima);
             return true;
         }
-        System.out.println("Caminhão " + id + " não pode coletar mais " + quantidade + " toneladas. Carga máxima atingida.");
+        System.out.println("[CAMINHÃO " + id + "] Carga máxima atingida.");
         return false;
     }
 
     public int descarregar() {
         int carga = cargaAtual;
         cargaAtual = 0;
-        System.out.println("Caminhão " + id + " descarregou " + carga + " toneladas.");
+        System.out.println("[CAMINHÃO " + id + "] Descarregou " + carga + " toneladas.");
         return carga;
     }
 
@@ -67,14 +68,14 @@ public class CaminhaoPequeno {
 
         int tempoFinal = (int) (tempoBase * multiplicador);
 
-        System.out.println("Caminhão " + id + " tempo de viagem calculado: " + tempoFinal + " minutos. (Multiplicador: " + multiplicador + ")");
+        System.out.println("[CAMINHÃO " + id + "]tempo de viagem calculado: " + tempoFinal + " minutos. (Multiplicador: " + multiplicador + ")");
         return tempoFinal;
     }
 
     public void registrarViagem() {
         if (numeroDeViagensDiarias > 0) {
             numeroDeViagensDiarias--;
-            System.out.println("Caminhão " + id + " registrou uma viagem. Viagens restantes: " + numeroDeViagensDiarias);
+            System.out.println("[CAMINHÃO " + id + "] "+ numeroDeViagensDiarias + " VIAGENS RESTANTES" );
         }
     }
 
