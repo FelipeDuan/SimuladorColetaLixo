@@ -2,29 +2,45 @@ package simulador.zona;
 
 import java.util.Random;
 
-public class Zonas {
+public class Zona {
     private String nome;
-    private int lixoAcumulado;
+    private int lixoMinimo;
+    private int lixoMaximo;
+    private int lixoAcomulado;
 
-    public Zonas(String nome) {
+    public Zona(String nome, int lixoMinimo, int lixoMaximo) {
         this.nome = nome;
-        this.lixoAcumulado = 0;
+        this.lixoMinimo = lixoMinimo;
+        this.lixoMaximo = lixoMaximo;
+        this.lixoAcomulado = 0;
     }
 
-    public void gerarLixo() {
-        int quantidade = new Random().nextInt(500) + 100;
-        lixoAcumulado += quantidade;
-        System.out.println(nome + ": Gerou " + quantidade + "kg de lixo. Total: " + lixoAcumulado + "kg.");
+    public void gerarLixoDiario() {
+        this.lixoAcomulado = new Random().nextInt(lixoMaximo - lixoMinimo + 1) + lixoMinimo;
+        System.out.println("[Zona] " + nome + " gerou " + lixoAcomulado + " toneladas de lixo.");
     }
+
 
     public int coletarLixo(int quantidade) {
-        int coletado = Math.min(quantidade, lixoAcumulado);
-        lixoAcumulado -= coletado;
+        int coletado = Math.min(quantidade, lixoAcomulado);
+        lixoAcomulado -= coletado;
         return coletado;
     }
 
+    public boolean temLixoRestante() {
+    return lixoAcomulado > 0;
+}
+
     public int getLixoAcumulado() {
-        return lixoAcumulado;
+        return lixoAcomulado;
+    }
+
+    public boolean estaLimpa() {
+    return lixoAcomulado == 0;
+}
+
+    public boolean precisaDeColeta(int limiteMinimo) {
+        return lixoAcomulado >= limiteMinimo;
     }
 
     public String getNome() {
