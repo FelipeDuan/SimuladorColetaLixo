@@ -2,6 +2,8 @@ package simulador.util;
 
 import simulador.configuracao.ParametrosSimulacao;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * Classe utilitária para conversão e cálculo de tempos na simulação.
  * <p>
@@ -77,4 +79,32 @@ public class TempoUtil {
 
         return tempoFinal;
     }
+
+    /**
+     * Calcula o tempo total (coleta + deslocamento), considerando carga, pico e se o caminhão está carregado.
+     *
+     * @param tempoAtual      Tempo da simulação atual (em minutos)
+     * @param cargaToneladas  Quantidade coletada ou transportada
+     * @param carregado       true se o caminhão estiver carregado (indo para estação), false se estiver coletando
+     * @return Tempo total da operação em minutos
+     */
+    public static int calcularTempoTotalDeslocamento(int tempoAtual, int cargaToneladas, boolean carregado) {
+        // 1. Tempo base aleatório conforme pico
+        boolean pico = ParametrosSimulacao.isHorarioDePico(tempoAtual);
+        int min = pico ? ParametrosSimulacao.TEMPO_MIN_PICO : ParametrosSimulacao.TEMPO_MIN_FORA_PICO;
+        int max = pico ? ParametrosSimulacao.TEMPO_MAX_PICO : ParametrosSimulacao.TEMPO_MAX_FORA_PICO;
+        int tempoBase = ThreadLocalRandom.current().nextInt(min, max + 1);
+
+        // 2. Tempo ajustado com multiplicador
+        int tempoDeslocamento = calcularTempoRealDeViagem(tempoAtual, tempoBase);
+
+        // 3. Tempo de coleta (por tonelada)
+        int tempoColeta = cargaToneladas * ParametrosSimulacao.TEMPO_COLETA_POR_TONELADA;
+
+        // 4. Se carregado, aplica um tempo extra (ex: 30% mais lento)
+        int tempoExtraCarregado = carregado ? (int) (tempoDeslocamento * 0.3) : 0;
+
+        return tempoDeslocamento + tempoColeta + tempoExtraCarregado;
+    }
+
 }

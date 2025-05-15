@@ -24,13 +24,17 @@ public class Simulador {
 
     public void iniciarSimulacao() {
         Zona leste = Zonas.zonaLeste();
-        System.out.println("===========================================================");
-        System.out.println("Iniciando simulação de coleta de lixo em Teresina");
+        System.out.println("===========  S I M U L A Ç Ã O   I N I C I A D A  ===========");
+        System.out.println();
         leste.gerarLixoDiario();
         System.out.println();
 
         CaminhaoPequeno c1 = new CaminhaoPequeno("1", 4, 2);
+//        CaminhaoPequeno c2 = new CaminhaoPequeno("2", 4, 2);
+//        CaminhaoPequeno c3 = new CaminhaoPequeno("3", 4, 2);
 
+//        AgendaEventos.adicionarEvento(new EventoColeta(0, c3, leste));
+//        AgendaEventos.adicionarEvento(new EventoColeta(0, c2, leste));
         AgendaEventos.adicionarEvento(new EventoColeta(0, c1, leste));
 
         AgendaEventos.processarEventos();
@@ -40,7 +44,7 @@ public class Simulador {
 
 
         System.out.println();
-            System.out.println("===========================================================");
+            System.out.println("============================================================");
         System.out.println("Simulação finalizada com sucesso!");
         System.out.println("Tempo total: " + TempoUtil.formatarDuracao(tempoFinal) + " (encerra às " + TempoUtil.formatarHorarioSimulado(tempoFinal) + ")");
         System.out.println("[LIXO FINAL] " + leste.getLixoAcumulado()+"T");
