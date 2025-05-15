@@ -3,6 +3,9 @@ package simulador.eventos;
 import simulador.caminhoes.CaminhaoPequeno;
 import simulador.configuracao.ParametrosSimulacao;
 import simulador.util.TempoUtil;
+import simulador.zona.Zona;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Representa um evento de coleta de lixo realizado por um caminhão pequeno no simulador.
@@ -19,16 +22,17 @@ import simulador.util.TempoUtil;
  */
     public class EventoColeta extends Evento {
         private CaminhaoPequeno caminhao;
-
+        private Zona zona;
         /**
          * Constrói um novo Evento de Coleta.
          *
          * @param tempo O tempo em minutos quando o evento ocorrerá
          * @param caminhao O caminhão pequeno que realizará a coleta
          */
-        public EventoColeta(int tempo, CaminhaoPequeno caminhao) {
+        public EventoColeta(int tempo, CaminhaoPequeno caminhao, Zona zona) {
             super(tempo);
             this.caminhao = caminhao;
+            this.zona = zona; // ✔ agora sim: o parâmetro e o campo têm o mesmo nome
         }
 
     /**
@@ -50,29 +54,58 @@ import simulador.util.TempoUtil;
      */
     @Override
     public void executar() {
-        System.out.println("==================================================");
-        System.out.println("[COLETA] CAMINHÃO " + caminhao.getId());
+        // Header
+        String horarioAtual = TempoUtil.formatarHorarioSimulado(tempo);
+        System.out.println("======================= C O L E T A =======================");
+        System.out.printf("[%s] \n",horarioAtual);
+System.out.printf("[COLETA] Caminhão %s → Zona %s%n",
+             caminhao.getId(), zona.getNome());
 
-        boolean coletou = caminhao.coletar(ParametrosSimulacao.QUANTIDADE_COLETA_POR_EVENTO);
+        // Verifica disponibilidade na zona
+        int qtdZona = zona.getLixoAcumulado();
+        if (qtdZona == 0) {
+            System.out.println("  • Zona está limpa. Nenhuma coleta realizada.");
+            return;
+        }
 
+        // Coleta
+        int qtdSol = ParametrosSimulacao.QUANTIDADE_COLETA_POR_EVENTO;
+        int qtdReal = Math.min(qtdSol, qtdZona);
+        boolean coletou = caminhao.coletar(qtdReal);
+        if (coletou) {
+            zona.coletarLixo(qtdReal);
+            System.out.printf("  • Coletou: %dt    Carga: %d/%d%n",
+                qtdReal, caminhao.getCargaAtual(), caminhao.getCapacidadeMaxima());
+        } else {
+            System.out.println("  • Carga máxima atingida. Encerrando jornada.");
+        }
+
+        // Agendamento de próximo passo
         if (caminhao.podeRealizarNovaViagem() && coletou) {
-            int tempoBase = (int) (Math.random() *
-                (ParametrosSimulacao.TEMPO_MAX_FORA_PICO - ParametrosSimulacao.TEMPO_MIN_FORA_PICO + 1)
-                + ParametrosSimulacao.TEMPO_MIN_FORA_PICO);
+            // Define tempo base conforme pico
+            boolean pico = ParametrosSimulacao.isHorarioDePico(tempo);
+            int min = pico ? ParametrosSimulacao.TEMPO_MIN_PICO : ParametrosSimulacao.TEMPO_MIN_FORA_PICO;
+            int max = pico ? ParametrosSimulacao.TEMPO_MAX_PICO : ParametrosSimulacao.TEMPO_MAX_FORA_PICO;
+            int tempoBase = ThreadLocalRandom.current().nextInt(min, max + 1);
 
             int tempoReal = TempoUtil.calcularTempoRealDeViagem(tempo, tempoBase);
+            String duracao = TempoUtil.formatarDuracao(tempoReal);
+            String proximoHorario = TempoUtil.formatarHorarioSimulado(tempo + tempoReal);
 
-            System.out.println("TEMPO DE TRAJETO: " + TempoUtil.converterMinutoParaHora(tempoReal));
+            System.out.printf("  • Tempo de trajeto: %s    Próximo horário: %s%n",
+                duracao, proximoHorario);
 
-            int HoraDoDia = AgendaEventos.getTempoUltimoEvento() + tempoReal + 420;
-            System.out.println("[" + TempoUtil.converterMinutoParaHora(HoraDoDia)+ "]");
-
-            AgendaEventos.adicionarEvento(new EventoColeta(tempo + tempoReal, caminhao));
+            // Agenda próxima coleta
+            AgendaEventos.adicionarEvento(new EventoColeta(tempo + tempoReal, caminhao, zona));
         } else {
-            System.out.println();
-            System.out.println("[Status] Caminhão " + caminhao.getId() + " encerrando jornada e indo para estação.");
-            AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tempo + 1, caminhao));
+            // Finaliza coleta e vai para transferência
+            System.out.println("===========================================================");
+            int tTransfer = tempo + 1;
+            String hTransfer = TempoUtil.formatarHorarioSimulado(tTransfer);
+            System.out.printf("[%s] \n",hTransfer);
+            System.out.printf("[TRANSFERÊNCIA] Caminhão %s → Estação de Transferência%n",
+                hTransfer, caminhao.getId());
+            AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tTransfer, caminhao));
         }
-        System.out.println();
     }
 }
