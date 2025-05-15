@@ -15,10 +15,6 @@ public class EventoTransferenciaParaEstacao extends Evento {
 
     @Override
     public void executar() {
-        int tempoFinal = AgendaEventos.getTempoUltimoEvento() + 420;
-        String horaDia =  TempoUtil.converterMinutoParaHora(tempoFinal);
-
-        System.out.println("[" + horaDia + "]");
         System.out.println("[CAMINHÃO " + caminhao.getId() + "] chegando na estação de transferência.");
 
 //        caminhao.viajarPara("Estação de Transferência"); // animação e atualização de zona
