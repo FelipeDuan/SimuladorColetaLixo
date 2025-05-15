@@ -25,7 +25,7 @@ public class ParametrosSimulacao {
     public static final int TEMPO_DESCARGA_POR_TONELADA = 5;
 
     /** Tempo médio para carregar por tonelada (em minutos) */
-    public static final int TEMPO_CARREGAMENTO_POR_TONELADA = 6;
+    public static final int TEMPO_COLETA_POR_TONELADA = 10;
 
     /** Tempo máximo de espera nas estações para caminhões pequenos (minutos) */
     public static final int TEMPO_MAX_ESPERA_CAMINHAO_PEQUENO = 15;
@@ -82,7 +82,7 @@ public class ParametrosSimulacao {
 
     // ==================== PARÂMETROS DE SIMULAÇÃO ====================
     /** Quantidade de lixo coletado por evento de coleta (em toneladas) */
-    public static final int QUANTIDADE_COLETA_POR_EVENTO = 2;
+//    public static final int QUANTIDADE_COLETA_POR_EVENTO 0;
 
     /** Duração total da simulação em minutos (24 horas) */
     public static final int DURACAO_SIMULACAO_MINUTOS = 1440;
