@@ -19,6 +19,46 @@ public class CaminhaoPequeno {
         this.emViagem = false;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public int getCapacidadeMaxima() {
+        return capacidadeMaxima;
+    }
+
+    public void setCapacidadeMaxima(int capacidadeMaxima) {
+        this.capacidadeMaxima = capacidadeMaxima;
+    }
+
+    public void setCargaAtual(int cargaAtual) {
+        this.cargaAtual = cargaAtual;
+    }
+
+    public int getNumeroDeViagensDiarias() {
+        return numeroDeViagensDiarias;
+    }
+
+    public void setNumeroDeViagensDiarias(int numeroDeViagensDiarias) {
+        this.numeroDeViagensDiarias = numeroDeViagensDiarias;
+    }
+
+    public String getZonaAtual() {
+        return zonaAtual;
+    }
+
+    public void setZonaAtual(String zonaAtual) {
+        this.zonaAtual = zonaAtual;
+    }
+
+    public boolean isEmViagem() {
+        return emViagem;
+    }
+
+    public void setEmViagem(boolean emViagem) {
+        this.emViagem = emViagem;
+    }
+
     public String getId() {
         return id;
     }
@@ -31,7 +71,6 @@ public class CaminhaoPequeno {
         if (cargaAtual + quantidade <= capacidadeMaxima) {
             cargaAtual += quantidade;
             System.out.println("[CAMINHÃO " + id +"]" + " Coletou " + quantidade + " toneladas");
-            System.out.println("[CAMINHÃO " + id +"]" + " Carga atual: " + cargaAtual + "/" + capacidadeMaxima);
             return true;
         }
         System.out.println("[CAMINHÃO " + id + "] Carga máxima atingida.");

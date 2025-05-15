@@ -5,6 +5,8 @@ import simulador.estacoes.EstacaoDeTransferencia;
 import simulador.eventos.AgendaEventos;
 import simulador.eventos.EventoColeta;
 import simulador.util.TempoUtil;
+import simulador.zona.Zona;
+import simulador.zona.Zonas;
 
 public class Simulador {
 
@@ -21,26 +23,28 @@ public class Simulador {
     }
 
     public void iniciarSimulacao() {
-        System.out.println("Iniciando simulação de coleta de lixo em Teresina...");
+        Zona leste = Zonas.zonaLeste();
+        System.out.println("===========================================================");
+        System.out.println("Iniciando simulação de coleta de lixo em Teresina");
+        leste.gerarLixoDiario();
+        System.out.println();
 
-        CaminhaoPequeno caminhao1 = new CaminhaoPequeno("1", 8, 3); // id 1, capacidade 4 ton, 3 viagens
+        CaminhaoPequeno c1 = new CaminhaoPequeno("1", 4, 2);
 
-        AgendaEventos.adicionarEvento(new EventoColeta(0, caminhao1));
+        AgendaEventos.adicionarEvento(new EventoColeta(0, c1, leste));
 
         AgendaEventos.processarEventos();
 
         System.out.println();
         int tempoFinal = AgendaEventos.getTempoUltimoEvento();
-        int horaDia = tempoFinal + 420;
 
 
         System.out.println();
-        System.out.println("============================================");
+            System.out.println("===========================================================");
         System.out.println("Simulação finalizada com sucesso!");
-        System.out.println("Tempo total de simulação: " + TempoUtil.converterMinutoParaHora(AgendaEventos.getTempoUltimoEvento()));
-        System.out.println("[Tempo Final] Simulação encerrada às " + TempoUtil.converterMinutoParaHora(horaDia));
-        System.out.println("Caminhões rodaram, lixo coletado, missão cumprida!");
-        System.out.println("============================================");
+        System.out.println("Tempo total: " + TempoUtil.formatarDuracao(tempoFinal) + " (encerra às " + TempoUtil.formatarHorarioSimulado(tempoFinal) + ")");
+        System.out.println("[LIXO FINAL] " + leste.getLixoAcumulado()+"T");
+            System.out.println("===========================================================");
     }
 
     public void continuar() {
