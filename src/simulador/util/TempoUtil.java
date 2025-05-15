@@ -11,22 +11,33 @@ import simulador.configuracao.ParametrosSimulacao;
 public class TempoUtil {
 
     /**
-     * Converte minutos totais em formato de hora legível (HH:MM).
-     * <p>
-     * Considera que a simulação inicia às 07:00 horas.
+     * Converte os minutos decorridos desde o início da simulação (07:00)
+     * em um horário real no formato "HH:mm".
      *
-     * @param minutos Total de minutos decorridos desde o início da simulação
-     * @return String formatada no padrão HH:MM representando a hora atual
-     * @throws IllegalArgumentException se minutos for negativo
+     * @param minutosDecorridos total de minutos desde as 07:00
+     * @return String no formato "HH:mm", representando o horário simulado
+     * @throws IllegalArgumentException se minutosDecorridos for negativo
      */
-    public static String converterMinutoParaHora(int minutos) {
-        if (minutos < 0) {
+    public static String formatarHorarioSimulado(int minutosDecorridos) {
+        if (minutosDecorridos < 0) {
             throw new IllegalArgumentException("Minutos não podem ser negativos");
         }
+        int hora = 7 + (minutosDecorridos / 60);
+        int minuto = minutosDecorridos % 60;
+        return String.format("%02d:%02d", hora, minuto);
+    }
 
-        int hora =  minutos / 60;
-        int minuto = minutos % 60;
-        return String.format("%02d:%02d:00", hora, minuto);
+    /**
+ * Converte uma duração (em minutos) para a forma "Xh Ym" ou "Z min"
+ */
+    public static String formatarDuracao(int duracaoMinutos) {
+        int horas = duracaoMinutos / 60;
+        int minutos = duracaoMinutos % 60;
+        if (horas > 0) {
+            return String.format("%dh %02dmin", horas, minutos);
+        } else {
+            return String.format("%dmin", minutos);
+        }
     }
 
     /**
