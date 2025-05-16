@@ -91,7 +91,7 @@ import java.util.concurrent.ThreadLocalRandom;
                 String hTransfer = TempoUtil.formatarHorarioSimulado(tTransfer);
                 System.out.printf("[%s] \n",hTransfer);
                 System.out.printf("[TRANSFERÊNCIA] Caminhão %s → Estação de Transferência%n",
-                    hTransfer, caminhao.getId());
+                    caminhao.getId());
                 AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tTransfer, caminhao));
         }
     }
