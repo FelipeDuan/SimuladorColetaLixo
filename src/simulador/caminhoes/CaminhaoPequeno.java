@@ -1,7 +1,5 @@
 package simulador.caminhoes;
 
-import simulador.configuracao.ParametrosSimulacao;
-
 public class CaminhaoPequeno {
 
     private String id;
