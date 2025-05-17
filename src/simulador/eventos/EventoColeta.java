@@ -99,8 +99,6 @@ public class EventoColeta extends Evento {
             int tTransfer = tempo + 1;
             String hTransfer = TempoUtil.formatarHorarioSimulado(tTransfer);
             System.out.printf("[%s] \n", hTransfer);
-            System.out.printf("[TRANSFERÊNCIA] Caminhão %s → Estação de Transferência%n",
-                    caminhao.getId());
             AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tTransfer, caminhao, zonaAtual));
         }
     }
