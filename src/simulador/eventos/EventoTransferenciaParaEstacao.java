@@ -2,6 +2,7 @@ package simulador.eventos;
 
 import simulador.caminhoes.CaminhaoPequeno;
 import simulador.estacoes.EstacaoDeTransferencia;
+import simulador.util.TempoDetalhado;
 import simulador.util.TempoUtil;
 import simulador.zona.MapeadorZonas;
 import simulador.zona.Zona;
@@ -27,13 +28,29 @@ public class EventoTransferenciaParaEstacao extends Evento {
     @Override
     public void executar() {
         // 1) escolhe a estação certa
-        EstacaoDeTransferencia estacaoDestino =
-                MapeadorZonas.getEstacaoPara(zonaOrigem);
+        EstacaoDeTransferencia estacaoDestino = MapeadorZonas.getEstacaoPara(zonaOrigem);
 
-        estacaoDestino.receberCaminhaoPequeno(caminhaoPequeno, getTempo());
+        // 2) obtém o tempo atual da simulação
+        int tempoAtual = getTempo();  // tempo deste evento, em minutos
 
-         System.out.printf("[TRANSFERÊNCIA] Caminhão %s → Estação %s%n",
-            caminhaoPequeno.getId(),
-            estacaoDestino.getNomeEstacao());
+        // 3) obtém a carga atual do caminhão (assumindo que há um método getCargaAtual)
+        int cargaAtual = caminhaoPequeno.getCargaAtual();  // substitua pelo método correto
+
+        // 4) calcula o tempo total considerando que está carregado e horário de pico
+        TempoDetalhado tempoDetalhado = TempoUtil.calcularTempoDetalhado(tempoAtual, cargaAtual, true);
+
+
+        // 5) simula a recepção do caminhão na estação (pode ser instantâneo ou considerar o tempo total)
+        estacaoDestino.receberCaminhaoPequeno(caminhaoPequeno, tempoAtual + tempoDetalhado.tempoTotal);
+
+        // 6) log para debug / info
+        System.out.printf("[TRANSFERÊNCIA] Caminhão %s → Estação %s%n", caminhaoPequeno.getId(), estacaoDestino.getNomeEstacao());
+        System.out.printf("  • Tempo de trajeto: %s%n", TempoUtil.formatarDuracao(tempoDetalhado.tempoDeslocamento));
+        if (tempoDetalhado.tempoExtraCarregado > 0) {
+            System.out.printf("  • Tempo extra por carga: +%s%n", TempoUtil.formatarDuracao(tempoDetalhado.tempoExtraCarregado));
+        }
+        System.out.printf("  • Tempo total da viagem: %s%n", TempoUtil.formatarDuracao(tempoDetalhado.tempoTotal));
+        System.out.printf("  • Horário previsto de chegada: %s%n", TempoUtil.formatarHorarioSimulado(tempoAtual + tempoDetalhado.tempoTotal));
+
     }
 }

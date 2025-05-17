@@ -95,7 +95,9 @@ public class TempoUtil {
         int tempoBase = ThreadLocalRandom.current().nextInt(min, max + 1);
 
         int tempoDeslocamento = calcularTempoRealDeViagem(tempoAtual, tempoBase);
-        int tempoColeta = cargaToneladas * ParametrosSimulacao.TEMPO_COLETA_POR_TONELADA;
+
+        int tempoColeta = carregado ? 0 : cargaToneladas * ParametrosSimulacao.TEMPO_COLETA_POR_TONELADA;
+
         int tempoExtraCarregado = carregado ? (int) (tempoDeslocamento * 0.3) : 0;
 
         return new TempoDetalhado(tempoColeta, tempoDeslocamento, tempoExtraCarregado);
