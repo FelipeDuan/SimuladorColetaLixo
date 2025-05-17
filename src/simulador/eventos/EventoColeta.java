@@ -68,7 +68,7 @@ import java.util.concurrent.ThreadLocalRandom;
             int tempoDeslocamento = TempoUtil.calcularTempoRealDeViagem(tempo, tempoBase);
 
             // 2. Aplica tempo extra se estiver carregado (aqui: ainda não está carregado, então false)
-            int tempoExtraCarregado = 0; // ou use uma regra separada se quiser
+            int tempoExtraCarregado = 0;
             int tempoTotal = tempoColeta + tempoDeslocamento + tempoExtraCarregado;
 
             // 3. Logs informativos
