@@ -5,26 +5,27 @@ import simulador.caminhoes.CaminhaoPequeno;
 import simulador.estacoes.EstacaoDeTransferencia;
 import simulador.configuracao.ParametrosSimulacao;
 import simulador.util.TempoUtil;
+import simulador.zona.MapeadorZonas;
+import simulador.zona.Zona;
 
 public class EventoTransferenciaParaEstacao extends Evento {
     private CaminhaoPequeno caminhaoPequeno;
-     private EstacaoDeTransferencia estacao;
-    private CaminhaoGrande CaminhaoGrande;
+    private Zona zonaOrigem;
 
-    public EventoTransferenciaParaEstacao(int tempo, CaminhaoPequeno caminhaoPequeno) {
+    public EventoTransferenciaParaEstacao(int tempo, CaminhaoPequeno caminhaoPequeno, Zona zonaOrigem) {
         super(tempo);
         this.caminhaoPequeno = caminhaoPequeno;
+        zonaOrigem = zonaOrigem;
     }
 
     @Override
     public void executar() {
+        // 1) escolhe a estação certa
+        EstacaoDeTransferencia estacaoDestino =
+                MapeadorZonas.getEstacaoPara(zonaOrigem);
 
-        System.out.println("[CAMINHÃO " + caminhaoPequeno.getId() + "] chegando na estação de transferência.");
+        estacaoDestino.receberCaminhaoPequeno(caminhaoPequeno, getTempo());
 
-        int cargaTransferida = caminhaoPequeno.descarregar();
-        caminhaoPequeno.registrarViagem();
-
-        System.out.println();
-        EstacaoDeTransferencia.receberCarga(caminhaoPequeno, cargaTransferida);
+        System.out.printf("[TRANSFERÊNCIA] Caminhão %s → Estação de Transferência%n", caminhaoPequeno.getId());
     }
 }

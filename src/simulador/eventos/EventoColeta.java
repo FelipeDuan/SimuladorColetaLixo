@@ -9,18 +9,18 @@ import java.util.concurrent.ThreadLocalRandom;
 
     public class EventoColeta extends Evento {
         private CaminhaoPequeno caminhao;
-        private Zona zona;
+        private Zona zonaAtual;
         public EventoColeta(int tempo, CaminhaoPequeno caminhao, Zona zona) {
             super(tempo);
             this.caminhao = caminhao;
-            this.zona = zona;
+            this.zonaAtual = zona;
         }
 
     @Override
     public void executar() {
 
         // Verifica disponibilidade na zona
-        int qtdZona = zona.getLixoAcumulado();
+        int qtdZona = zonaAtual.getLixoAcumulado();
         if (qtdZona == 0) {
             System.out.println("  • Zona está limpa. Nenhuma coleta realizada.");
             return;
@@ -32,9 +32,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
         while (caminhao.podeRealizarNovaViagem() &&
                 caminhao.getCargaAtual() < caminhao.getCapacidadeMaxima() &&
-                zona.getLixoAcumulado() > 0) {
+                zonaAtual.getLixoAcumulado() > 0) {
 
-            int qtdDisponivelZona = zona.getLixoAcumulado();
+            int qtdDisponivelZona = zonaAtual.getLixoAcumulado();
             int espacoRestante = caminhao.getCapacidadeMaxima() - caminhao.getCargaAtual();
             int qtdReal = Math.min(qtdDisponivelZona, espacoRestante);
 
@@ -42,11 +42,11 @@ import java.util.concurrent.ThreadLocalRandom;
             String horarioAtual = TempoUtil.formatarHorarioSimulado(tempo);
             System.out.println("======================= C O L E T A =======================");
             System.out.printf("[%s] \n",horarioAtual);
-            System.out.printf("[COLETA] Caminhão %s → Zona %s | %s Viagens %n", caminhao.getId(), zona.getNome(),caminhao.getNumeroDeViagensDiarias());
+            System.out.printf("[COLETA] Caminhão %s → Zona %s | %s Viagens %n", caminhao.getId(), zonaAtual.getNome(),caminhao.getNumeroDeViagensDiarias());
 
             coletou = caminhao.coletar(qtdReal);
             if (coletou) {
-                zona.coletarLixo(qtdReal);
+                zonaAtual.coletarLixo(qtdReal);
                 totalColetado += qtdReal;
                 System.out.printf("  • Coletou: %dt    Carga: %d/%d%n",
                         qtdReal, caminhao.getCargaAtual(), caminhao.getCapacidadeMaxima());
@@ -83,7 +83,7 @@ import java.util.concurrent.ThreadLocalRandom;
             System.out.printf("  • Horário: %s    Tempo total: %s%n", horario, duracao);
 
             // 4. Agendamento
-            AgendaEventos.adicionarEvento(new EventoColeta(tempo + tempoTotal, caminhao, zona));
+//            AgendaEventos.adicionarEvento(new EventoColeta(tempo + tempoTotal, caminhao, zonaAtual));
         } else {
                 // Finaliza coleta e vai para transferência
                 System.out.println("===========================================================");
@@ -92,7 +92,7 @@ import java.util.concurrent.ThreadLocalRandom;
                 System.out.printf("[%s] \n",hTransfer);
                 System.out.printf("[TRANSFERÊNCIA] Caminhão %s → Estação de Transferência%n",
                     caminhao.getId());
-                AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tTransfer, caminhao));
+                AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tTransfer, caminhao, zonaAtual));
         }
     }
 }
