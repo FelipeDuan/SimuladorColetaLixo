@@ -1,11 +1,9 @@
 package simulador.eventos;
 
 import simulador.caminhoes.CaminhaoPequeno;
-import simulador.configuracao.ParametrosSimulacao;
+import simulador.util.TempoDetalhado;
 import simulador.util.TempoUtil;
 import simulador.zona.Zona;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 public class EventoColeta extends Evento {
     private CaminhaoPequeno caminhao;
@@ -67,27 +65,22 @@ public class EventoColeta extends Evento {
 
         // Agendamento de próximo passo
         if (caminhao.podeRealizarNovaViagem() && coletou) {
-            // 1. Calcular partes separadas
-            int tempoColeta = totalColetado * ParametrosSimulacao.TEMPO_COLETA_POR_TONELADA;
+            int tempoAtual = tempo;
 
-            boolean pico = ParametrosSimulacao.isHorarioDePico(tempo);
-            int min = pico ? ParametrosSimulacao.TEMPO_MIN_PICO : ParametrosSimulacao.TEMPO_MIN_FORA_PICO;
-            int max = pico ? ParametrosSimulacao.TEMPO_MAX_PICO : ParametrosSimulacao.TEMPO_MAX_FORA_PICO;
-            int tempoBase = ThreadLocalRandom.current().nextInt(min, max + 1);
-            int tempoDeslocamento = TempoUtil.calcularTempoRealDeViagem(tempo, tempoBase);
+            TempoDetalhado tempoDetalhado = TempoUtil.calcularTempoDetalhado(tempoAtual, totalColetado, false);
 
-            int tempoTotal = tempoColeta + tempoDeslocamento;
+            System.out.printf("  • Tempo de coleta: %s%n", TempoUtil.formatarDuracao(tempoDetalhado.tempoColeta));
+            System.out.printf("  • Tempo de trajeto: %s%n", TempoUtil.formatarDuracao(tempoDetalhado.tempoDeslocamento));
+            if (tempoDetalhado.tempoExtraCarregado > 0)
+                System.out.printf("  • Carga cheia: +%s%n", TempoUtil.formatarDuracao(tempoDetalhado.tempoExtraCarregado));
 
-            // 3. Logs informativos
-            String horario = TempoUtil.formatarHorarioSimulado(tempo + tempoTotal);
-            String duracao = TempoUtil.formatarDuracao(tempoTotal);
+            System.out.printf("  • Horário: %s    Tempo total: %s%n",
+                    TempoUtil.formatarHorarioSimulado(tempoAtual + tempoDetalhado.tempoTotal),
+                    TempoUtil.formatarDuracao(tempoDetalhado.tempoTotal)
+            );
 
-            System.out.printf("  • Tempo de coleta: %s%n", TempoUtil.formatarDuracao(tempoColeta));
-            System.out.printf("  • Tempo de trajeto: %s%n", TempoUtil.formatarDuracao(tempoDeslocamento));
-            System.out.printf("  • Horário: %s    Tempo total: %s%n", horario, duracao);
-
-            // 4. Agendamento
-            AgendaEventos.adicionarEvento(new EventoColeta(tempo + tempoTotal, caminhao, zonaAtual));
+            //  Agendamento
+            AgendaEventos.adicionarEvento(new EventoColeta(tempoAtual + tempoDetalhado.tempoTotal, caminhao, zonaAtual));
         } else {
             // Finaliza coleta e vai para transferência
             System.out.println("===========================================================");
