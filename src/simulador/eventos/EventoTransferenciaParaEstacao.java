@@ -1,10 +1,7 @@
 package simulador.eventos;
 
-import simulador.caminhoes.CaminhaoGrande;
 import simulador.caminhoes.CaminhaoPequeno;
 import simulador.estacoes.EstacaoDeTransferencia;
-import simulador.configuracao.ParametrosSimulacao;
-import simulador.util.TempoUtil;
 import simulador.zona.MapeadorZonas;
 import simulador.zona.Zona;
 
