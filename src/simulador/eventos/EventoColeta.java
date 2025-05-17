@@ -76,9 +76,7 @@ public class EventoColeta extends Evento {
             int tempoBase = ThreadLocalRandom.current().nextInt(min, max + 1);
             int tempoDeslocamento = TempoUtil.calcularTempoRealDeViagem(tempo, tempoBase);
 
-            // 2. Aplica tempo extra se estiver carregado (aqui: ainda não está carregado, então false)
-            int tempoExtraCarregado = 0;
-            int tempoTotal = tempoColeta + tempoDeslocamento + tempoExtraCarregado;
+            int tempoTotal = tempoColeta + tempoDeslocamento;
 
             // 3. Logs informativos
             String horario = TempoUtil.formatarHorarioSimulado(tempo + tempoTotal);
@@ -86,9 +84,6 @@ public class EventoColeta extends Evento {
 
             System.out.printf("  • Tempo de coleta: %s%n", TempoUtil.formatarDuracao(tempoColeta));
             System.out.printf("  • Tempo de trajeto: %s%n", TempoUtil.formatarDuracao(tempoDeslocamento));
-            if (tempoExtraCarregado > 0)
-                System.out.printf("  • Carga cheia: +%s%n", TempoUtil.formatarDuracao(tempoExtraCarregado));
-
             System.out.printf("  • Horário: %s    Tempo total: %s%n", horario, duracao);
 
             // 4. Agendamento
