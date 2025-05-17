@@ -5,8 +5,11 @@ import estruturas.lista.Lista;
 public class AgendaEventos {
     private static Lista<Evento> eventos = new Lista<>();
     private static int tempoUltimoEvento = 0;
+    private static Evento ultimoEventoExecutado = null;
+
     /**
      * Adiciona um novo evento à agenda, mantendo a ordem pelo tempo do evento
+     *
      * @param evento O evento a ser agendado
      * @throws IllegalArgumentException se o evento for nulo
      */
@@ -29,6 +32,7 @@ public class AgendaEventos {
         while (temEventos()) {
             Evento evento = eventos.removerHead();
             tempoUltimoEvento = evento.getTempo();
+            ultimoEventoExecutado = evento;
             evento.executar();
         }
     }
@@ -37,13 +41,12 @@ public class AgendaEventos {
         return tempoUltimoEvento;
     }
 
-    /**
-     * Verifica se existem eventos pendentes na agenda
-     * @return true se houver eventos, false caso contrário
-     */
+    public static Evento getUltimoEventoExecutado() {
+        return ultimoEventoExecutado;
+    }
+
     public static boolean temEventos() {
         return !eventos.estaVazia();
     }
-
 
 }

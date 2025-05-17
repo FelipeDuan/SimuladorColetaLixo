@@ -18,9 +18,6 @@ public class Simulador {
         // 2. Diz ao mapeador quem atende cada conjunto de zonas
         MapeadorZonas.configurar(estA, estB);
 
-
-
-
         Zona leste = Zonas.zonaLeste();
         System.out.println("===========================================================");
         System.out.println("Iniciando simulação de coleta de lixo em Teresina");
@@ -40,7 +37,10 @@ public class Simulador {
         System.out.println("===========================================================");
         System.out.println("Simulação finalizada com sucesso!");
         System.out.println("Tempo total: " + TempoUtil.formatarDuracao(tempoFinal) + " (encerra às " + TempoUtil.formatarHorarioSimulado(tempoFinal) + ")");
-        System.out.println("[LIXO FINAL] " + leste.getLixoAcumulado()+"T");
+        System.out.println("[LIXO FINAL] " + leste.getLixoAcumulado() + "T");
         System.out.println("===========================================================");
+
+        System.out.println("Último evento processado: " + AgendaEventos.getUltimoEventoExecutado());
+
     }
 }

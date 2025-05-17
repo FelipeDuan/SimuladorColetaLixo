@@ -2,6 +2,7 @@ package simulador.eventos;
 
 import simulador.caminhoes.CaminhaoPequeno;
 import simulador.estacoes.EstacaoDeTransferencia;
+import simulador.util.TempoUtil;
 import simulador.zona.MapeadorZonas;
 import simulador.zona.Zona;
 
@@ -12,7 +13,15 @@ public class EventoTransferenciaParaEstacao extends Evento {
     public EventoTransferenciaParaEstacao(int tempo, CaminhaoPequeno caminhaoPequeno, Zona zonaOrigem) {
         super(tempo);
         this.caminhaoPequeno = caminhaoPequeno;
-        zonaOrigem = zonaOrigem;
+        this.zonaOrigem = zonaOrigem;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("EventoTransferencia | Caminhão %s | Zona %s | Horário: %s",
+                caminhaoPequeno.getId(),
+                zonaOrigem.getNome(),
+                TempoUtil.formatarHorarioSimulado(getTempo()));
     }
 
     @Override

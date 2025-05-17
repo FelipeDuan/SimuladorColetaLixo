@@ -28,16 +28,16 @@ public class Zona {
     }
 
     public boolean temLixoRestante() {
-    return lixoAcomulado > 0;
-}
+        return lixoAcomulado > 0;
+    }
 
     public int getLixoAcumulado() {
         return lixoAcomulado;
     }
 
     public boolean estaLimpa() {
-    return lixoAcomulado == 0;
-}
+        return lixoAcomulado == 0;
+    }
 
     public boolean precisaDeColeta(int limiteMinimo) {
         return lixoAcomulado >= limiteMinimo;

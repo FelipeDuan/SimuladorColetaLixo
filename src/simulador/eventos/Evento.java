@@ -12,7 +12,9 @@ package simulador.eventos;
  * @see Comparable
  */
 public abstract class Evento implements Comparable<Evento> {
-    /** O tempo em minutos quando o evento deve ocorrer na simulação */
+    /**
+     * O tempo em minutos quando o evento deve ocorrer na simulação
+     */
     protected int tempo;
 
     /**
@@ -52,7 +54,7 @@ public abstract class Evento implements Comparable<Evento> {
      *
      * @param outro O outro evento a ser comparado
      * @return Um valor negativo, zero ou positivo se este evento for anterior,
-     *         simultâneo ou posterior ao evento comparado, respectivamente
+     * simultâneo ou posterior ao evento comparado, respectivamente
      * @throws NullPointerException se o outro evento for null
      */
     @Override
