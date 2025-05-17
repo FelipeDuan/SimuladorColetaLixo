@@ -1,7 +1,6 @@
 package simulador.util;
 
 import simulador.configuracao.ParametrosSimulacao;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -30,8 +29,8 @@ public class TempoUtil {
     }
 
     /**
- * Converte uma duração (em minutos) para a forma "Xh Ym" ou "Z min"
- */
+     * Converte uma duração (em minutos) para a forma "Xh Ym" ou "Z min"
+     */
     public static String formatarDuracao(int duracaoMinutos) {
         int horas = duracaoMinutos / 60;
         int minutos = duracaoMinutos % 60;
@@ -51,7 +50,7 @@ public class TempoUtil {
      *   <li>Fora de pico: tempo normal</li>
      * </ul>
      *
-     * @param tempoAtual Minutos decorridos desde o início da simulação
+     * @param tempoAtual  Minutos decorridos desde o início da simulação
      * @param duracaoBase Duração base da viagem em minutos (sem considerar pico)
      * @return Tempo total ajustado em minutos
      * @throws IllegalArgumentException se qualquer parâmetro for negativo
@@ -83,9 +82,9 @@ public class TempoUtil {
     /**
      * Calcula o tempo total (coleta + deslocamento), considerando carga, pico e se o caminhão está carregado.
      *
-     * @param tempoAtual      Tempo da simulação atual (em minutos)
-     * @param cargaToneladas  Quantidade coletada ou transportada
-     * @param carregado       true se o caminhão estiver carregado (indo para estação), false se estiver coletando
+     * @param tempoAtual     Tempo da simulação atual (em minutos)
+     * @param cargaToneladas Quantidade coletada ou transportada
+     * @param carregado      true se o caminhão estiver carregado (indo para estação), false se estiver coletando
      * @return Tempo total da operação em minutos
      */
     public static int calcularTempoTotalDeslocamento(int tempoAtual, int cargaToneladas, boolean carregado) {
@@ -106,5 +105,4 @@ public class TempoUtil {
 
         return tempoDeslocamento + tempoColeta + tempoExtraCarregado;
     }
-
 }

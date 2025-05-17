@@ -32,6 +32,8 @@ public class EventoTransferenciaParaEstacao extends Evento {
 
         estacaoDestino.receberCaminhaoPequeno(caminhaoPequeno, getTempo());
 
-        System.out.printf("[TRANSFERÊNCIA] Caminhão %s → Estação de Transferência%n", caminhaoPequeno.getId());
+         System.out.printf("[TRANSFERÊNCIA] Caminhão %s → Estação %s%n",
+            caminhaoPequeno.getId(),
+            estacaoDestino.getNomeEstacao());
     }
 }

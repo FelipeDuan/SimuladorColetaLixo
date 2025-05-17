@@ -1,6 +1,7 @@
 package simulador.estacoes;
 
 import java.util.LinkedList;
+
 import simulador.caminhoes.CaminhaoPequeno;
 
 public class EstacaoDeTransferencia {
@@ -9,7 +10,11 @@ public class EstacaoDeTransferencia {
     private static int cargaAcumulada = 0;
 
     public EstacaoDeTransferencia(String nomeEstacao) {
-        nomeEstacao = nomeEstacao;
+        this.nomeEstacao = nomeEstacao;
+    }
+
+    public String getNomeEstacao() {
+        return nomeEstacao;
     }
 
     public void receberCaminhaoPequeno(CaminhaoPequeno caminhao, int tempoAtual) {
