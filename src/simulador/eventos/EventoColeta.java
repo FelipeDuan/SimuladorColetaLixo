@@ -30,6 +30,11 @@ public class EventoColeta extends Evento {
     }
 
 
+    /**
+     * Retorna uma representação textual do evento, útil para logs e rastreamento.
+     *
+     * @return string formatada com dados do caminhão, zona e horário
+     */
     @Override
     public String toString() {
         return String.format("EventoColeta | Caminhão %s | Zona %s | Horário: %s",
