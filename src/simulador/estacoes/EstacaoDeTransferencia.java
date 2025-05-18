@@ -9,6 +9,12 @@ import simulador.eventos.EventoGerarCaminhaoGrande;
 import simulador.util.ConsoleCor;
 import simulador.util.TempoUtil;
 
+/**
+ * Representa uma estação de transferência de lixo.
+ * <p>
+ * Recebe caminhões pequenos carregados, armazena os caminhões em fila se necessário,
+ * e gerencia o carregamento do caminhão grande responsável por levar o lixo ao aterro.
+ */
 public class EstacaoDeTransferencia {
     public String nomeEstacao;
     private CaminhaoGrande caminhaoGrandeAtual;
