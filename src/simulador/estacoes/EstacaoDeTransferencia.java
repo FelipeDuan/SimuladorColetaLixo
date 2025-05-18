@@ -85,18 +85,21 @@ public class EstacaoDeTransferencia {
         System.out.printf("[%s | Caminhão %s]%n", nomeEstacao, caminhao.getId());
         System.out.println("  → Chegada confirmada.");
 
+        // Caso não haja caminhão grande ou ele esteja cheio
         if (caminhaoGrandeAtual == null || caminhaoGrandeAtual.estaCheio()) {
             filaCaminhoes.enqueue(caminhao);
             System.out.printf("  • Fila de espera aumentou. Tamanho: %d%n", filaCaminhoes.size());
 
+            // Agenda evento de criação de caminhão grande se ainda não estiver agendado
             if (caminhao.getEventoAgendado() == null) {
-                int tempoLimite = tempoAtual + 100; // 30 minutos de espera
+                int tempoLimite = tempoAtual + 100; // 30 minutos de espera (tolerância de 100 minutos)
                 EventoGerarCaminhaoGrande evento = new EventoGerarCaminhaoGrande(tempoLimite, this);
                 AgendaEventos.adicionarEvento(evento);
                 caminhao.setEventoAgendado(evento);
                 System.out.printf("  • Evento para gerar caminhão grande agendado para %s%n", TempoUtil.formatarDuracao(tempoLimite));
             }
         } else {
+            // Caso consiga descarregar direto
             if (caminhao.getEventoAgendado() != null) {
                 AgendaEventos.removerEvento(caminhao.getEventoAgendado());
                 caminhao.setEventoAgendado(null);
@@ -114,12 +117,14 @@ public class EstacaoDeTransferencia {
             System.out.printf("  → Volta para atividadades %n", TempoUtil.formatarHorarioSimulado(tempoDescarga + tempoAtual));
             // Adicionar metodo aqui
 
+            // Se caminhão grande ficou cheio, envia para o aterro
             if (caminhaoGrandeAtual.estaCheio()) {
                 System.out.println("  • Caminhão grande cheio!");
                 System.out.println();
                 System.out.printf("[COLETA] Caminhão Grande %s → Aterro%n", caminhaoGrandeAtual.getId());
                 caminhaoGrandeAtual.descarregar();
 
+                // Tenta descarregar fila após liberar novo caminhão
                 descarregarFilaEspera(tempoAtual);
             }
         }
