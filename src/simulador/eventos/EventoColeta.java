@@ -43,6 +43,14 @@ public class EventoColeta extends Evento {
                 TempoUtil.formatarHorarioSimulado(getTempo()));
     }
 
+    /**
+     * Executa a lógica de coleta de lixo:
+     * <ul>
+     *     <li>Verifica se há lixo disponível na zona</li>
+     *     <li>Realiza a coleta respeitando a capacidade do caminhão</li>
+     *     <li>Agenda uma nova coleta ou envio para a estação de transferência</li>
+     * </ul>
+     */
     @Override
     public void executar() {
         // Verifica disponibilidade na zona
