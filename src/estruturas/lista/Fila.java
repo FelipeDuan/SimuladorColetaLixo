@@ -93,6 +93,11 @@ public class Fila<T> {
         return valor;
     }
 
+    /**
+     * Verifica se a fila está vazia.
+     *
+     * @return {@code true} se a fila estiver vazia, {@code false} caso contrário
+     */
     public boolean isEmpty() {
         return head == null;
     }
