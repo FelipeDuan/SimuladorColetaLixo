@@ -44,6 +44,11 @@ public class CaminhaoPequeno {
         return capacidadeMaxima;
     }
 
+    /**
+     * Retorna o número restante de viagens diárias.
+     *
+     * @return número de viagens disponíveis
+     */
     public int getNumeroDeViagensDiarias() {
         return numeroDeViagensDiarias;
     }
