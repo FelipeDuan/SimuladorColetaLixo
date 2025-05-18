@@ -8,6 +8,12 @@ import simulador.zona.MapeadorZonas;
 import simulador.zona.Zona;
 import simulador.zona.Zonas;
 
+/**
+ * Classe responsável por iniciar e coordenar a simulação de coleta de lixo.
+ * <p>
+ * A simulação é baseada em eventos e utiliza zonas, caminhões pequenos e estações de transferência.
+ * Caminhões são criados com destinos definidos e os eventos iniciais são agendados e processados em ordem cronológica.
+ */
 public class Simulador {
     public void iniciarSimulacao() {
         // 1. Cria as 2 estações
