@@ -31,8 +31,7 @@ public class EventoGerarCaminhaoGrande extends Evento {
      */
     @Override
     public void executar() {
-
-        // Garante que não gere duplicado
+        // Evita duplicação: só gera se ainda não houver caminhão grande disponível
         if (estacao.temCaminhaoGrandeDisponivel()) return;
 
         System.out.println("[GERAÇÃO] Tempo máximo de espera atingido. Criando caminhão grande.");
