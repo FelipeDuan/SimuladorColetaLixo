@@ -2,6 +2,13 @@ package simulador.eventos;
 
 import simulador.estacoes.EstacaoDeTransferencia;
 
+
+/**
+ * Evento responsável por gerar um novo caminhão grande em uma estação de transferência.
+ * <p>
+ * Este evento é acionado quando os caminhões pequenos atingem o tempo máximo de espera
+ * e o caminhão grande atual está indisponível (cheio ou ausente).
+ */
 public class EventoGerarCaminhaoGrande extends Evento {
     private EstacaoDeTransferencia estacao;
 
