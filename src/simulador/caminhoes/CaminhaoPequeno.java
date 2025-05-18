@@ -35,6 +35,11 @@ public class CaminhaoPequeno {
         this.zonaAlvo = zonaAlvo;
     }
 
+    /**
+     * Retorna a capacidade máxima de carga do caminhão.
+     *
+     * @return capacidade máxima em toneladas
+     */
     public int getCapacidadeMaxima() {
         return capacidadeMaxima;
     }
