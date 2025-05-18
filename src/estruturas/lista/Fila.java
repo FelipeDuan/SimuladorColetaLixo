@@ -53,6 +53,14 @@ public class Fila<T> {
         return true;
     }
 
+    /**
+     * (Não utilizado)
+     *
+     * Remove e retorna o elemento no início da fila.
+     * Exibe uma mensagem se a fila estiver vazia.
+     *
+     * @return o valor removido, ou {@code null} se a fila estiver vazia
+     */
     public T dequeue() {
         if (head == null) {
             System.out.println("Fila vazia");
