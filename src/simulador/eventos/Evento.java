@@ -19,9 +19,9 @@ public abstract class Evento implements Comparable<Evento> {
     protected int tempo;
 
     /**
-     * Constrói um novo Evento com o tempo especificado.
+     * Construtor da classe base {@code Evento}.
      *
-     * @param tempo O tempo em minutos quando o evento ocorrerá na simulação
+     * @param tempo o tempo (em minutos desde o início da simulação) em que o evento deve ocorrer
      * @throws IllegalArgumentException se o tempo for negativo
      */
     public Evento(int tempo) {
