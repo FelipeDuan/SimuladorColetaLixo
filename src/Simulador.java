@@ -1,6 +1,4 @@
-import simulador.caminhoes.CaminhaoGrande;
 import simulador.caminhoes.CaminhaoPequeno;
-import simulador.configuracao.ParametrosSimulacao;
 import simulador.estacoes.EstacaoDeTransferencia;
 import simulador.eventos.AgendaEventos;
 import simulador.eventos.EventoColeta;
@@ -20,14 +18,25 @@ public class Simulador {
         MapeadorZonas.configurar(estA, estB);
 
         Zona leste = Zonas.zonaLeste();
+        Zona norte = Zonas.zonaNorte();
+
         System.out.println(ConsoleCor.AMARELO + "=================== S I M U L A D O R ==================");
 
         System.out.println("Iniciando simulação de coleta de lixo em Teresina");
         leste.gerarLixoDiario();
+        norte.gerarLixoDiario();
         System.out.println();
 
-        CaminhaoPequeno c1 = new CaminhaoPequeno("1", 4, 2, leste);
+        CaminhaoPequeno c1 = new CaminhaoPequeno("1", 5, 2, leste);
+        CaminhaoPequeno c2 = new CaminhaoPequeno("2", 5, 2, leste);
+        CaminhaoPequeno c3 = new CaminhaoPequeno("3", 5, 2, leste);
+        CaminhaoPequeno c4 = new CaminhaoPequeno("4", 5, 2, leste);
+        CaminhaoPequeno c5 = new CaminhaoPequeno("5", 5, 2, leste);
 
+        AgendaEventos.adicionarEvento(new EventoColeta(0, c5, c5.getZonaAlvo()));
+        AgendaEventos.adicionarEvento(new EventoColeta(0, c4, c4.getZonaAlvo()));
+        AgendaEventos.adicionarEvento(new EventoColeta(0, c3, c3.getZonaAlvo()));
+        AgendaEventos.adicionarEvento(new EventoColeta(0, c2, c2.getZonaAlvo()));
         AgendaEventos.adicionarEvento(new EventoColeta(0, c1, c1.getZonaAlvo()));
 
         AgendaEventos.processarEventos();

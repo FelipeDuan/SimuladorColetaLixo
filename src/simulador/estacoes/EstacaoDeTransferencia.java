@@ -41,14 +41,15 @@ public class EstacaoDeTransferencia {
     public void receberCaminhaoPequeno(CaminhaoPequeno caminhao, int tempoAtual) {
         System.out.println(ConsoleCor.ROXO + "====================== E S T A Ç Ã O ======================");
         System.out.printf("[%s]%n", TempoUtil.formatarHorarioSimulado(tempoAtual));
-        System.out.printf("  • Caminhão pequeno %s chegou.%n", caminhao.getId());
+        System.out.printf("[%s | Caminhão %s]%n", nomeEstacao, caminhao.getId());
+        System.out.println("  → Chegada confirmada.");
 
         if (caminhaoGrandeAtual == null || caminhaoGrandeAtual.estaCheio()) {
             filaCaminhoes.enqueue(caminhao);
             System.out.printf("  • Fila de espera aumentou. Tamanho: %d%n", filaCaminhoes.size());
 
             if (caminhao.getEventoAgendado() == null) {
-                int tempoLimite = tempoAtual + 30; // 30 minutos de espera
+                int tempoLimite = tempoAtual + 100; // 30 minutos de espera
                 EventoGerarCaminhaoGrande evento = new EventoGerarCaminhaoGrande(tempoLimite, this);
                 AgendaEventos.adicionarEvento(evento);
                 caminhao.setEventoAgendado(evento);
@@ -64,13 +65,13 @@ public class EstacaoDeTransferencia {
             int carga = caminhao.getCargaAtual();
             int tempoDescarga = carga * ParametrosSimulacao.TEMPO_DESCARGA_POR_TONELADA;
 
-            System.out.printf("  • Tempo de descarregamento: %s%n", TempoUtil.formatarDuracao(tempoDescarga));
-            System.out.printf("[ESTAÇÃO %s]  • Caminhão pequeno %s da fila descarregou %d toneladas.%n",
-                    nomeEstacao, caminhao.getId(), carga);
-
             caminhaoGrandeAtual.receberCarga(carga);
             caminhao.descarregar();
 
+            System.out.printf("  • Descarregou: %dt    Carga: %d/%d%n", carga, caminhao.getCargaAtual(), caminhao.getCapacidadeMaxima());
+            System.out.printf("  • Horário: %s     Tempo de Descarga: %s%n", TempoUtil.formatarHorarioSimulado(tempoDescarga + tempoAtual), TempoUtil.formatarDuracao(tempoDescarga));
+            System.out.printf("  → Volta para atividadades %n", TempoUtil.formatarHorarioSimulado(tempoDescarga + tempoAtual));
+            // Adicionar metodo aqui
 
             if (caminhaoGrandeAtual.estaCheio()) {
                 System.out.println("  • Caminhão grande cheio!");
