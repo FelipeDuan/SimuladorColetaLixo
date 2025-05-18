@@ -19,6 +19,14 @@ public class CaminhaoPequeno {
     private EventoGerarCaminhaoGrande eventoAgendado;
 
 
+    /**
+     * Construtor do caminhão pequeno.
+     *
+     * @param id identificador único do caminhão
+     * @param capacidadeMaxima capacidade máxima de carga (em toneladas)
+     * @param numeroDeViagensDiarias número total de viagens permitidas por dia
+     * @param zonaAlvo zona de coleta associada a este caminhão
+     */
     public CaminhaoPequeno(String id, int capacidadeMaxima, int numeroDeViagensDiarias, Zona zonaAlvo) {
         this.id = id;
         this.capacidadeMaxima = capacidadeMaxima;
