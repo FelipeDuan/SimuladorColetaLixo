@@ -34,6 +34,13 @@ public class CaminhaoGrande {
         return id;
     }
 
+    /**
+     * (Não utilizado)
+     * <p>
+     * Retorna a carga atual armazenada no caminhão.
+     *
+     * @return a carga atual (em unidades)
+     */
     public int getCargaAtual() {
         return cargaAtual;
     }
