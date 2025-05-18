@@ -28,6 +28,11 @@ public class EventoEstacaoTransferencia extends Evento{
         this.caminhao = caminhao;
     }
 
+    /**
+     * Retorna uma descrição textual do evento, útil para logs e exibição.
+     *
+     * @return string formatada com dados do caminhão, estação e horário
+     */
     @Override
     public String toString() {
         return String.format("EventoEstacaoTransferencia | Caminhão %s | Estação %s | Horário: %s",
