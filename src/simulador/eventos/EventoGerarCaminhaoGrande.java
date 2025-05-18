@@ -26,7 +26,7 @@ public class EventoGerarCaminhaoGrande extends Evento {
     /**
      * Executa a lógica de geração de caminhão grande.
      * <p>
-     * Verifica se a estação ainda está sem caminhão grande disponível e,
+     * Verifica se a estação continua sem caminhão grande disponível e,
      * caso afirmativo, instancia um novo caminhão para atender os caminhões pequenos em fila.
      */
     @Override
