@@ -73,6 +73,8 @@ public class Zona {
     }
 
     /**
+     * (Não utilizado)
+     * <p>
      * Verifica se a zona está completamente limpa (sem lixo acumulado).
      *
      * @return {@code true} se o lixo acumulado for 0, caso contrário {@code false}
@@ -82,6 +84,8 @@ public class Zona {
     }
 
     /**
+     * (Não utilizado)
+     * <p>
      * Verifica se a zona precisa de coleta, com base em um limite mínimo definido.
      *
      * @param limiteMinimo o valor mínimo que define a necessidade de coleta
