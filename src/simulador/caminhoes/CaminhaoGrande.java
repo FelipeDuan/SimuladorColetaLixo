@@ -45,14 +45,31 @@ public class CaminhaoGrande {
         return cargaAtual;
     }
 
+     /**
+     * (Não utilizado)
+     * <p>
+     * Retorna a capacidade máxima de carga do caminhão.
+     *
+     * @return capacidade máxima (em unidades)
+     */
     public int getCapacidadeMaxima() {
         return capacidadeMaxima;
     }
 
+    /**
+     * Verifica se o caminhão atingiu sua capacidade máxima de carga.
+     *
+     * @return {@code true} se o caminhão estiver cheio, {@code false} caso contrário
+     */
     public boolean estaCheio() {
         return cargaAtual >= capacidadeMaxima;
     }
 
+    /**
+     * Recebe uma quantidade de carga. Se ultrapassar a capacidade, a carga é limitada ao máximo.
+     *
+     * @param quantidade a quantidade de carga a ser adicionada
+     */
     public void receberCarga(int quantidade) {
         if (cargaAtual + quantidade > capacidadeMaxima) {
             cargaAtual = capacidadeMaxima;
@@ -61,6 +78,11 @@ public class CaminhaoGrande {
         }
     }
 
+    /**
+     * Executa o descarregamento do caminhão no aterro.
+     * <p>
+     * Zera a carga e marca que o caminhão finalizou o processo de carregamento.
+     */
     public void descarregar() {
         System.out.println("Caminhão grande #" + id + " partiu para o aterro com " + cargaAtual + " unidades de carga.");
         cargaAtual = 0;
