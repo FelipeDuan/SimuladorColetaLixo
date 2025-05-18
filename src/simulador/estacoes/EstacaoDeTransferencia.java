@@ -20,7 +20,11 @@ public class EstacaoDeTransferencia {
     private CaminhaoGrande caminhaoGrandeAtual;
     private Fila<CaminhaoPequeno> filaCaminhoes = new Fila<>();
 
-
+    /**
+     * Construtor da estação de transferência.
+     *
+     * @param nomeEstacao o nome identificador da estação
+     */
     public EstacaoDeTransferencia(String nomeEstacao) {
         this.nomeEstacao = nomeEstacao;
         this.caminhaoGrandeAtual = new CaminhaoGrande();
