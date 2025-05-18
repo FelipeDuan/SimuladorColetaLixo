@@ -12,6 +12,12 @@ import simulador.estacoes.EstacaoDeTransferencia;
 public class EventoGerarCaminhaoGrande extends Evento {
     private EstacaoDeTransferencia estacao;
 
+    /**
+     * Construtor do evento de geração de caminhão grande.
+     *
+     * @param tempo    o tempo (em minutos) em que o evento será executado
+     * @param estacao  a estação de transferência onde o caminhão será gerado
+     */
     public EventoGerarCaminhaoGrande(int tempo, EstacaoDeTransferencia estacao) {
         super(tempo);
         this.estacao = estacao;
