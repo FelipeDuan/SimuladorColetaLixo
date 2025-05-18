@@ -120,6 +120,11 @@ public class Fila<T> {
         System.out.println("[EXIT]");
     }
 
+    /**
+     * Retorna o número de elementos atualmente armazenados na fila.
+     *
+     * @return o tamanho da fila
+     */
     public int size() {
         return tamanho;
     }
