@@ -24,6 +24,10 @@ public class Fila<T> {
     private No<T> head, tail;
     private int tamanho;
 
+
+    /**
+     * Construtor da fila. Inicializa a estrutura vazia.
+     */
     public Fila() {
         head = null;
         tail = null;
