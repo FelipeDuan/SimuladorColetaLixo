@@ -8,6 +8,13 @@ import simulador.util.TempoUtil;
 import simulador.zona.MapeadorZonas;
 import simulador.zona.Zona;
 
+
+/**
+ * Evento responsável por realizar a transferência de um caminhão pequeno para uma estação de transferência.
+ * <p>
+ * Quando executado, calcula o tempo de deslocamento com base na carga e no horário atual,
+ * e agenda a chegada do caminhão à estação por meio de um {@link EventoEstacaoTransferencia}.
+ */
 public class EventoTransferenciaParaEstacao extends Evento {
     private CaminhaoPequeno caminhaoPequeno;
     private Zona zonaOrigem;
