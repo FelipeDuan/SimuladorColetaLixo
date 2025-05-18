@@ -1,12 +1,11 @@
 package simulador.configuracao;
 
 /**
- * Classe contendo todos os parâmetros de configuração para a simulação.
+ * Classe contendo todos os parâmetros de configuração da simulação.
  * <p>
- * Esta classe centraliza todas as constantes utilizadas no sistema de simulação,
- * organizadas em categorias lógicas para fácil manutenção e ajuste.
- * <p>
- * Padrão de implementação: Singleton (todos os membros são estáticos e finais)
+ * Centraliza constantes utilizadas ao longo do sistema, permitindo ajustes rápidos e
+ * manutenção facilitada. É implementada como um utilitário singleton, com todos os
+ * campos estáticos e um construtor privado.
  */
 public class ParametrosSimulacao {
 
