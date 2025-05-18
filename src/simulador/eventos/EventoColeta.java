@@ -1,6 +1,7 @@
 package simulador.eventos;
 
 import simulador.caminhoes.CaminhaoPequeno;
+import simulador.util.ConsoleCor;
 import simulador.util.TempoDetalhado;
 import simulador.util.TempoUtil;
 import simulador.zona.Zona;
@@ -47,7 +48,7 @@ public class EventoColeta extends Evento {
 
             // Header
             String horarioAtual = TempoUtil.formatarHorarioSimulado(tempo);
-            System.out.println("======================= C O L E T A =======================");
+            System.out.println(ConsoleCor.VERDE + "====================== C O L E T A ======================");
             System.out.printf("[%s] \n", horarioAtual);
             System.out.printf("[COLETA] Caminhão %s → Zona %s | %s Viagens %n", caminhao.getId(), zonaAtual.getNome(), caminhao.getNumeroDeViagensDiarias());
 
@@ -78,16 +79,13 @@ public class EventoColeta extends Evento {
                     TempoUtil.formatarHorarioSimulado(tempoAtual + tempoDetalhado.tempoTotal),
                     TempoUtil.formatarDuracao(tempoDetalhado.tempoTotal)
             );
+            System.out.println();
 
             //  Agendamento
             AgendaEventos.adicionarEvento(new EventoColeta(tempoAtual + tempoDetalhado.tempoTotal, caminhao, zonaAtual));
         } else {
             // Finaliza coleta e vai para transferência
-            System.out.println("===========================================================");
-            int tTransfer = tempo + 1;
-            String hTransfer = TempoUtil.formatarHorarioSimulado(tTransfer);
-            System.out.printf("[%s] \n", hTransfer);
-            AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tTransfer, caminhao, zonaAtual));
+            AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tempo, caminhao, zonaAtual));
         }
     }
 }

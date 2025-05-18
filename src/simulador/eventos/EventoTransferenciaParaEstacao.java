@@ -2,6 +2,7 @@ package simulador.eventos;
 
 import simulador.caminhoes.CaminhaoPequeno;
 import simulador.estacoes.EstacaoDeTransferencia;
+import simulador.util.ConsoleCor;
 import simulador.util.TempoDetalhado;
 import simulador.util.TempoUtil;
 import simulador.zona.MapeadorZonas;
@@ -27,6 +28,7 @@ public class EventoTransferenciaParaEstacao extends Evento {
 
     @Override
     public void executar() {
+
         // 1) escolhe a estação certa
         EstacaoDeTransferencia estacaoDestino = MapeadorZonas.getEstacaoPara(zonaOrigem);
 
@@ -39,18 +41,19 @@ public class EventoTransferenciaParaEstacao extends Evento {
         // 4) calcula o tempo total considerando que está carregado e horário de pico
         TempoDetalhado tempoDetalhado = TempoUtil.calcularTempoDetalhado(tempoAtual, cargaAtual, true);
 
-
-        // 5) simula a recepção do caminhão na estação (pode ser instantâneo ou considerar o tempo total)
-        estacaoDestino.receberCaminhaoPequeno(caminhaoPequeno, tempoAtual + tempoDetalhado.tempoTotal);
-
         // 6) log para debug / info
-        System.out.printf("[TRANSFERÊNCIA] Caminhão %s → Estação %s%n", caminhaoPequeno.getId(), estacaoDestino.getNomeEstacao());
+        System.out.println(ConsoleCor.AZUL + "================ T R A N S F E R Ê N C I A ===============");
+        System.out.printf("[%s] \n", TempoUtil.formatarHorarioSimulado(tempoAtual + 1));
+        System.out.printf("Caminhão %s → Estação %s%n", caminhaoPequeno.getId(), estacaoDestino.getNomeEstacao());
         System.out.printf("  • Tempo de trajeto: %s%n", TempoUtil.formatarDuracao(tempoDetalhado.tempoDeslocamento));
         if (tempoDetalhado.tempoExtraCarregado > 0) {
             System.out.printf("  • Tempo extra por carga: +%s%n", TempoUtil.formatarDuracao(tempoDetalhado.tempoExtraCarregado));
         }
         System.out.printf("  • Tempo total da viagem: %s%n", TempoUtil.formatarDuracao(tempoDetalhado.tempoTotal));
         System.out.printf("  • Horário previsto de chegada: %s%n", TempoUtil.formatarHorarioSimulado(tempoAtual + tempoDetalhado.tempoTotal));
+        System.out.println();
+
+        AgendaEventos.adicionarEvento(new EventoEstacaoTransferencia((tempoAtual + tempoDetalhado.tempoTotal), estacaoDestino, caminhaoPequeno));
 
     }
 }

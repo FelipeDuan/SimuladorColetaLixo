@@ -4,6 +4,7 @@ import simulador.configuracao.ParametrosSimulacao;
 import simulador.estacoes.EstacaoDeTransferencia;
 import simulador.eventos.AgendaEventos;
 import simulador.eventos.EventoColeta;
+import simulador.util.ConsoleCor;
 import simulador.util.TempoUtil;
 import simulador.zona.MapeadorZonas;
 import simulador.zona.Zona;
@@ -19,7 +20,8 @@ public class Simulador {
         MapeadorZonas.configurar(estA, estB);
 
         Zona leste = Zonas.zonaLeste();
-        System.out.println("===========================================================");
+        System.out.println(ConsoleCor.AMARELO + "=================== S I M U L A D O R ==================");
+
         System.out.println("Iniciando simulação de coleta de lixo em Teresina");
         leste.gerarLixoDiario();
         System.out.println();
@@ -34,7 +36,7 @@ public class Simulador {
         int tempoFinal = AgendaEventos.getTempoUltimoEvento();
 
         System.out.println();
-        System.out.println("===========================================================");
+        System.out.println(ConsoleCor.RESET + "===========================================================");
         System.out.println("Simulação finalizada com sucesso!");
         System.out.println("Tempo total: " + TempoUtil.formatarDuracao(tempoFinal) + " (encerra às " + TempoUtil.formatarHorarioSimulado(tempoFinal) + ")");
         System.out.println("[LIXO FINAL] " + leste.getLixoAcumulado() + "T");
