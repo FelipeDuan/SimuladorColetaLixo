@@ -15,6 +15,11 @@ import simulador.zona.Zonas;
  * Caminhões são criados com destinos definidos e os eventos iniciais são agendados e processados em ordem cronológica.
  */
 public class Simulador {
+
+    /**
+     * Inicia a simulação de coleta de lixo, realizando a configuração
+     * inicial de zonas, estações, caminhões e eventos.
+     */
     public void iniciarSimulacao() {
         // 1. Cria as 2 estações
         EstacaoDeTransferencia estA = new EstacaoDeTransferencia("Estação A");
