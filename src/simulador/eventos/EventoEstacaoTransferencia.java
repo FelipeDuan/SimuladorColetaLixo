@@ -5,6 +5,12 @@ import simulador.estacoes.EstacaoDeTransferencia;
 import simulador.util.ConsoleCor;
 import simulador.util.TempoUtil;
 
+/**
+ * Evento responsável por levar um caminhão pequeno até uma estação de transferência para descarregamento.
+ * <p>
+ * Quando executado, o caminhão é entregue à estação, que decide se ele pode descarregar imediatamente
+ * ou será adicionado à fila de espera.
+ */
 public class EventoEstacaoTransferencia extends Evento{
     private EstacaoDeTransferencia estacao;
     private CaminhaoPequeno caminhao;
