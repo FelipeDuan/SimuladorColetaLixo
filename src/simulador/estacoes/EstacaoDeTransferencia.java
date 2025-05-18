@@ -50,6 +50,13 @@ public class EstacaoDeTransferencia {
         return nomeEstacao;
     }
 
+    /**
+     * (Não utilizado)
+     * <p>
+     * Retorna a fila de caminhões pequenos que aguardam descarregamento.
+     *
+     * @return fila de espera de caminhões pequenos
+     */
     public Fila<CaminhaoPequeno> getFilaCaminhoes() {
         return filaCaminhoes;
     }
