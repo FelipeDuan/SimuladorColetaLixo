@@ -15,6 +15,13 @@ public class EventoEstacaoTransferencia extends Evento{
     private EstacaoDeTransferencia estacao;
     private CaminhaoPequeno caminhao;
 
+    /**
+     * Construtor do evento de transferência para estação.
+     *
+     * @param tempo    o tempo (em minutos) em que o evento será executado
+     * @param estacao  a estação de transferência de destino
+     * @param caminhao o caminhão pequeno que será entregue à estação
+     */
     public EventoEstacaoTransferencia(int tempo, EstacaoDeTransferencia estacao, CaminhaoPequeno caminhao){
         super(tempo);
         this.estacao = estacao;
