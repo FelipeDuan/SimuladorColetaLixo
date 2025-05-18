@@ -6,6 +6,11 @@ package estruturas.lista;
  * @param <T> o tipo de elementos armazenados na fila
  */
 public class Fila<T> {
+
+    /**
+     * Classe interna que representa um nó da fila.
+     * Contém o valor armazenado e uma referência para o próximo nó.
+     */
     private static class No<T> {
         T valor;
         No<T> prox;
