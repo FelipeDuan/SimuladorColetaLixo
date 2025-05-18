@@ -3,6 +3,7 @@ import simulador.caminhoes.CaminhaoPequeno;
 import simulador.estacoes.EstacaoDeTransferencia;
 import simulador.eventos.AgendaEventos;
 import simulador.eventos.EventoColeta;
+import simulador.eventos.EventoDistribuidorDeRotas;
 import simulador.util.ConsoleCor;
 import simulador.util.TempoUtil;
 import simulador.zona.MapeadorZonas;
@@ -37,7 +38,7 @@ public class Simulador {
         }
 
         // 4. Inicializa caminhões e agenda os eventos iniciais
-        Lista<CaminhaoPequeno> caminhoes = criarCaminhoesComAgendamentoInicial(zonas, 5, 2);
+        Lista<CaminhaoPequeno> caminhoes = EventoDistribuidorDeRotas.distribuir(zonas, 5, 2);
 
         // 5. Inicia o processamento da simulação
         System.out.println(ConsoleCor.AMARELO + "=================== S I M U L A D O R ==================");
@@ -81,38 +82,4 @@ public class Simulador {
         zonas.adicionar(4, Zonas.zonaNorte());
         return zonas;
     }
-
-    /**
-     * Cria uma lista de caminhões pequenos e agenda os eventos iniciais de coleta.
-     *
-     * @param zonas Lista de zonas disponíveis para distribuir os caminhões.
-     * @param quantidadeCaminhoes Quantidade total de caminhões a serem criados.
-     * @param viagensPorCaminhao Número máximo de viagens que cada caminhão pode fazer.
-     * @return Lista de caminhões criados e configurados.
-     */
-    private Lista<CaminhaoPequeno> criarCaminhoesComAgendamentoInicial(Lista<Zona> zonas, int quantidadeCaminhoes, int viagensPorCaminhao) {
-        Lista<CaminhaoPequeno> listaDeCaminhoes = new Lista<>();
-        int quantidadeDeZonas = zonas.getTamanho();
-
-        for (int indice = 0; indice < quantidadeCaminhoes; indice++) {
-            // Distribui o caminhão para uma zona com base no índice
-            Zona zonaDestino = zonas.getValor(indice % quantidadeDeZonas);
-
-            // Cria o caminhão com ID único
-            String idCaminhao = "C" + (indice + 1);
-            int capacidadeMaxima = 5;
-
-            CaminhaoPequeno novoCaminhao = new CaminhaoPequeno(idCaminhao, capacidadeMaxima, viagensPorCaminhao, zonaDestino);
-
-            // Adiciona à lista
-            listaDeCaminhoes.adicionar(indice, novoCaminhao);
-
-            // Agenda o primeiro evento de coleta
-            EventoColeta eventoInicial = new EventoColeta(0, novoCaminhao, zonaDestino);
-            AgendaEventos.adicionarEvento(eventoInicial);
-        }
-
-        return listaDeCaminhoes;
-    }
-
 }

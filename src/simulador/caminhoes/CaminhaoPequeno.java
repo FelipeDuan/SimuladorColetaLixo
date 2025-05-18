@@ -1,5 +1,6 @@
 package simulador.caminhoes;
 
+import estruturas.lista.Lista;
 import simulador.eventos.EventoGerarCaminhaoGrande;
 import simulador.zona.Zona;
 
@@ -7,37 +8,53 @@ import simulador.zona.Zona;
  * Representa um caminhão pequeno responsável por coletar lixo nas zonas urbanas.
  * <p>
  * Cada caminhão possui uma capacidade máxima, um número limitado de viagens diárias
- * e está associado a uma zona específica de coleta.
+ * e uma rota composta por zonas a serem percorridas. A coleta ocorre em etapas, e o
+ * caminhão avança em sua rota conforme as viagens são realizadas.
  */
 public class CaminhaoPequeno {
 
+    // ========== ATRIBUTOS ==========
     private String id;
     private int capacidadeMaxima;
     private int cargaAtual;
     private int numeroDeViagensDiarias;
+
+    private Lista<Zona> rota;
+    private int indiceRota = 0;
+
     private Zona zonaAlvo;
     private EventoGerarCaminhaoGrande eventoAgendado;
 
+    // ========== CONSTRUTOR ==========
 
     /**
-     * Construtor do caminhão pequeno.
+     * Construtor do caminhão pequeno com uma rota pré-definida.
      *
      * @param id identificador único do caminhão
      * @param capacidadeMaxima capacidade máxima de carga (em toneladas)
      * @param numeroDeViagensDiarias número total de viagens permitidas por dia
-     * @param zonaAlvo zona de coleta associada a este caminhão
+     * @param rota lista ordenada de zonas que o caminhão visitará em sequência
      */
-    public CaminhaoPequeno(String id, int capacidadeMaxima, int numeroDeViagensDiarias, Zona zonaAlvo) {
+    public CaminhaoPequeno(String id, int capacidadeMaxima, int numeroDeViagensDiarias, Lista<Zona> rota) {
         this.id = id;
         this.capacidadeMaxima = capacidadeMaxima;
-        this.cargaAtual = 0;
         this.numeroDeViagensDiarias = numeroDeViagensDiarias;
-        this.zonaAlvo = zonaAlvo;
+        this.cargaAtual = 0;
+        this.rota = rota;
+        this.indiceRota = 0;
+        this.zonaAlvo = rota.getValor(0); // define zona inicial como a primeira da rota
+    }
+
+    // ========== GETTERS BÁSICOS ==========
+
+    /**
+     * @return identificador único do caminhão
+     */
+    public String getId() {
+        return id;
     }
 
     /**
-     * Retorna a capacidade máxima de carga do caminhão.
-     *
      * @return capacidade máxima em toneladas
      */
     public int getCapacidadeMaxima() {
@@ -45,69 +62,78 @@ public class CaminhaoPequeno {
     }
 
     /**
-     * Retorna o número restante de viagens diárias.
-     *
-     * @return número de viagens disponíveis
-     */
-    public int getNumeroDeViagensDiarias() {
-        return numeroDeViagensDiarias;
-    }
-
-    /**
-     * Retorna o identificador do caminhão.
-     *
-     * @return ID do caminhão
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Retorna a carga atual do caminhão.
-     *
-     * @return carga atual em toneladas
+     * @return carga atual do caminhão em toneladas
      */
     public int getCargaAtual() {
         return cargaAtual;
     }
 
     /**
-     * Retorna a zona de coleta atribuída ao caminhão.
+     * @return número restante de viagens permitidas no dia
+     */
+    public int getNumeroDeViagensDiarias() {
+        return numeroDeViagensDiarias;
+    }
+
+    /**
+     * Retorna a zona atualmente atribuída ao caminhão (usada em eventos legados).
      *
-     * @return zona alvo de coleta
+     * @return zona atual de coleta
      */
     public Zona getZonaAlvo() {
         return zonaAlvo;
     }
 
+    // ========== ROTA ==========
+
     /**
-     * Retorna o evento de geração de caminhão grande vinculado a este caminhão.
+     * Retorna a zona atual da rota que o caminhão está atendendo.
      *
-     * @return evento agendado ou {@code null}
+     * @return zona da etapa atual da rota
      */
-    public EventoGerarCaminhaoGrande getEventoAgendado() {
-        return eventoAgendado;
+    public Zona getZonaAtualDaRota() {
+        return rota.getValor(indiceRota);
     }
 
     /**
-     * Define o evento de geração de caminhão grande vinculado a este caminhão.
-     *
-     * @param eventoAgendado o evento a ser vinculado
+     * Avança para a próxima zona da rota, se houver.
+     * Também atualiza a referência da zona alvo.
      */
-    public void setEventoAgendado(EventoGerarCaminhaoGrande eventoAgendado) {
-        this.eventoAgendado = eventoAgendado;
+    public void avancarParaProximaZona() {
+        if (indiceRota < rota.getTamanho() - 1) {
+            indiceRota++;
+            this.zonaAlvo = rota.getValor(indiceRota);
+        }
     }
 
     /**
-     * Realiza a coleta de uma quantidade de lixo.
+     * Verifica se ainda há zonas na rota a serem visitadas.
      *
-     * @param quantidade a quantidade a ser coletada
-     * @return {@code true} se a coleta foi bem-sucedida, {@code false} se ultrapassou a capacidade
+     * @return true se há mais zonas na rota; false caso contrário
+     */
+    public boolean temMaisZonasNaRota() {
+        return indiceRota < rota.getTamanho() - 1;
+    }
+
+    /**
+     * @return rota completa do caminhão (lista de zonas)
+     */
+    public Lista<Zona> getRota() {
+        return rota;
+    }
+
+    // ========== COLETA ==========
+
+    /**
+     * Tenta coletar uma determinada quantidade de lixo.
+     *
+     * @param quantidade quantidade a ser coletada
+     * @return true se conseguiu coletar, false se excederia a capacidade
      */
     public boolean coletar(int quantidade) {
         if (cargaAtual + quantidade <= capacidadeMaxima) {
             cargaAtual += quantidade;
-            System.out.println("[CAMINHÃO " + id + "]" + " Coletou " + quantidade + " toneladas");
+            System.out.println("[CAMINHÃO " + id + "] Coletou " + quantidade + " toneladas");
             return true;
         }
         System.out.println("[CAMINHÃO " + id + "] Carga máxima atingida.");
@@ -115,29 +141,46 @@ public class CaminhaoPequeno {
     }
 
     /**
-     * Descarrega totalmente o caminhão (zera a carga atual).
+     * Descarta toda a carga do caminhão.
      */
     public void descarregar() {
         this.cargaAtual = 0;
     }
 
     /**
-     * Verifica se o caminhão ainda pode realizar viagens no dia.
+     * Verifica se o caminhão ainda pode realizar viagens hoje.
      *
-     * @return {@code true} se ainda restam viagens, {@code false} caso contrário
+     * @return true se há viagens restantes, false caso contrário
      */
     public boolean podeRealizarNovaViagem() {
         return numeroDeViagensDiarias > 0;
     }
 
     /**
-     * Registra uma viagem realizada, decrementando o contador de viagens restantes.
-     * Exibe no console o número de viagens restantes.
+     * Registra uma viagem realizada, decrementando o contador de viagens disponíveis.
      */
     public void registrarViagem() {
         if (numeroDeViagensDiarias > 0) {
             numeroDeViagensDiarias--;
             System.out.println("[CAMINHÃO " + id + "] " + numeroDeViagensDiarias + " VIAGENS RESTANTES");
         }
+    }
+
+    // ========== EVENTO DE GERAÇÃO DE CAMINHÃO GRANDE ==========
+
+    /**
+     * @return evento vinculado de geração de caminhão grande (se houver)
+     */
+    public EventoGerarCaminhaoGrande getEventoAgendado() {
+        return eventoAgendado;
+    }
+
+    /**
+     * Define ou atualiza o evento de geração de caminhão grande.
+     *
+     * @param eventoAgendado o evento a ser vinculado
+     */
+    public void setEventoAgendado(EventoGerarCaminhaoGrande eventoAgendado) {
+        this.eventoAgendado = eventoAgendado;
     }
 }
