@@ -34,6 +34,12 @@ public class Fila<T> {
         tamanho = 0;
     }
 
+    /**
+     * Insere um elemento no final da fila.
+     *
+     * @param valor o valor a ser adicionado
+     * @return {@code true} se a inserção for bem-sucedida
+     */
     public boolean enqueue(T valor) {
         No<T> novo = new No<>(valor);
         if (tail == null) {
