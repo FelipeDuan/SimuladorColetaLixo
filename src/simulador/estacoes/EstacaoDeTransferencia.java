@@ -61,6 +61,11 @@ public class EstacaoDeTransferencia {
         return filaCaminhoes;
     }
 
+    /**
+     * Verifica se existe um caminhão grande disponível e com capacidade para receber carga.
+     *
+     * @return {@code true} se houver caminhão grande e ele não estiver cheio
+     */
     public boolean temCaminhaoGrandeDisponivel() {
         return caminhaoGrandeAtual != null && !caminhaoGrandeAtual.estaCheio();
     }
