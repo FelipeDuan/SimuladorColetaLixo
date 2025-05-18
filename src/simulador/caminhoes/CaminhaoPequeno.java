@@ -71,6 +71,11 @@ public class CaminhaoPequeno {
         return cargaAtual;
     }
 
+    /**
+     * Retorna a zona de coleta atribuída ao caminhão.
+     *
+     * @return zona alvo de coleta
+     */
     public Zona getZonaAlvo() {
         return zonaAlvo;
     }
