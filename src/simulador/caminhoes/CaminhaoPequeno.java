@@ -53,6 +53,11 @@ public class CaminhaoPequeno {
         return numeroDeViagensDiarias;
     }
 
+    /**
+     * Retorna o identificador do caminhão.
+     *
+     * @return ID do caminhão
+     */
     public String getId() {
         return id;
     }
