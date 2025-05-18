@@ -121,6 +121,8 @@ public class Lista<T> {
     }
 
     /**
+     * (Não utilizado)
+     * <p>
      * Remove o elemento na posição especificada.
      *
      * @param pos a posição do elemento a ser removido (0-based)
@@ -214,6 +216,8 @@ public class Lista<T> {
     }
 
     /**
+     * (Não utilizado)
+     * <p>
      * Retorna o primeiro nó da lista (cabeça).
      *
      * @return o primeiro nó da lista, ou null se a lista estiver vazia
@@ -223,6 +227,8 @@ public class Lista<T> {
     }
 
     /**
+     * (Não utilizada)
+     * <p>
      * Retorna o tamanho atual da lista.
      *
      * @return o número de elementos na lista
@@ -243,6 +249,9 @@ public class Lista<T> {
     // ========== MÉTODOS DE VISUALIZAÇÃO ==========
 
     /**
+     * (Não utilizado)
+     * <p>
+     *
      * Imprime todos os elementos da lista do início ao fim.
      */
     public void imprimir() {
@@ -255,6 +264,9 @@ public class Lista<T> {
     }
 
     /**
+     * (Não utilizado)
+     * <p>
+     *
      * Imprime todos os elementos da lista do fim ao início.
      */
     public void imprimirReverso() {

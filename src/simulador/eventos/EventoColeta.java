@@ -6,10 +6,23 @@ import simulador.util.TempoDetalhado;
 import simulador.util.TempoUtil;
 import simulador.zona.Zona;
 
+/**
+ * Evento responsável por realizar a coleta de lixo em uma zona específica por um caminhão pequeno.
+ * <p>
+ * Executa o processo de coleta conforme a capacidade do caminhão e a quantidade de lixo disponível.
+ * Dependendo do resultado, agenda um novo evento de coleta ou transfere o caminhão para a estação.
+ */
 public class EventoColeta extends Evento {
     private CaminhaoPequeno caminhao;
     private Zona zonaAtual;
 
+    /**
+     * Construtor do evento de coleta.
+     *
+     * @param tempo     o tempo em que o evento será executado (em minutos desde o início da simulação)
+     * @param caminhao  o caminhão pequeno responsável pela coleta
+     * @param zona      a zona alvo da coleta
+     */
     public EventoColeta(int tempo, CaminhaoPequeno caminhao, Zona zona) {
         super(tempo);
         this.caminhao = caminhao;
@@ -17,6 +30,11 @@ public class EventoColeta extends Evento {
     }
 
 
+    /**
+     * Retorna uma representação textual do evento, útil para logs e rastreamento.
+     *
+     * @return string formatada com dados do caminhão, zona e horário
+     */
     @Override
     public String toString() {
         return String.format("EventoColeta | Caminhão %s | Zona %s | Horário: %s",
@@ -25,19 +43,28 @@ public class EventoColeta extends Evento {
                 TempoUtil.formatarHorarioSimulado(getTempo()));
     }
 
+    /**
+     * Executa a lógica de coleta de lixo:
+     * <ul>
+     *     <li>Verifica se há lixo disponível na zona</li>
+     *     <li>Realiza a coleta respeitando a capacidade do caminhão</li>
+     *     <li>Agenda uma nova coleta ou envio para a estação de transferência</li>
+     * </ul>
+     */
     @Override
     public void executar() {
-        // Verifica disponibilidade na zona
         int qtdZona = zonaAtual.getLixoAcumulado();
+
+        // ======================
+        // CASO 1: Zona está limpa
+        // ======================
         if (qtdZona == 0) {
             System.out.println("  • Zona está limpa. Nenhuma coleta realizada.");
 
-            // Considera como uma tentativa de viagem
             caminhao.registrarViagem();
 
             if (caminhao.podeRealizarNovaViagem()) {
-                // Agenda próxima tentativa (simulando tempo perdido na viagem)
-                int tempoDeEspera = 30; // ou o tempo de trajeto real
+                int tempoDeEspera = 30; // Tempo de deslocamento perdido
                 AgendaEventos.adicionarEvento(new EventoColeta(tempo + tempoDeEspera, caminhao, caminhao.getZonaAlvo()));
             } else {
                 AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tempo, caminhao, caminhao.getZonaAlvo()));
@@ -45,7 +72,9 @@ public class EventoColeta extends Evento {
             return;
         }
 
-        // Coleta
+        // ======================
+        // CASO 2: Coleta ocorre normalmente
+        // ======================
         boolean coletou = false;
         int totalColetado = 0;
 
@@ -57,7 +86,7 @@ public class EventoColeta extends Evento {
             int espacoRestante = caminhao.getCapacidadeMaxima() - caminhao.getCargaAtual();
             int qtdReal = Math.min(qtdDisponivelZona, espacoRestante);
 
-            // Header
+            // Header visual no terminal
             String horarioAtual = TempoUtil.formatarHorarioSimulado(tempo);
             System.out.println(ConsoleCor.VERDE + "====================== C O L E T A ======================");
             System.out.printf("[%s] \n", horarioAtual);
@@ -67,6 +96,7 @@ public class EventoColeta extends Evento {
             if (coletou) {
                 zonaAtual.coletarLixo(qtdReal);
                 totalColetado += qtdReal;
+
                 System.out.printf("  • Coletou: %dt    Carga: %d/%d%n",
                         qtdReal, caminhao.getCargaAtual(), caminhao.getCapacidadeMaxima());
             } else {
@@ -75,10 +105,14 @@ public class EventoColeta extends Evento {
             }
         }
 
-        // Agendamento de próximo passo
+        // ======================
+        // AGENDAMENTO FUTURO
+        // ======================
+
         if (caminhao.podeRealizarNovaViagem() && coletou) {
             int tempoAtual = tempo;
 
+            // Calcula o tempo de coleta + deslocamento
             TempoDetalhado tempoDetalhado = TempoUtil.calcularTempoDetalhado(tempoAtual, totalColetado, false);
 
             System.out.printf("  • Tempo de coleta: %s%n", TempoUtil.formatarDuracao(tempoDetalhado.tempoColeta));
@@ -92,10 +126,11 @@ public class EventoColeta extends Evento {
             );
             System.out.println();
 
-            //  Agendamento
+            // Agenda nova coleta
             AgendaEventos.adicionarEvento(new EventoColeta(tempoAtual + tempoDetalhado.tempoTotal, caminhao, zonaAtual));
+
         } else {
-            // Finaliza coleta e vai para transferência
+            // Vai para estação caso não possa mais coletar
             AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tempo, caminhao, zonaAtual));
         }
     }

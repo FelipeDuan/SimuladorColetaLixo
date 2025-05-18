@@ -4,23 +4,24 @@ package simulador.eventos;
  * Classe abstrata que representa um evento genérico no simulador.
  * <p>
  * Esta classe serve como base para todos os tipos de eventos no sistema de simulação,
- * fornecendo a estrutura básica para ordenação e execução de eventos.
+ * fornecendo a estrutura necessária para ordenação cronológica e execução de lógica específica.
  * <p>
- * Implementa {@code Comparable<Evento>} para permitir a ordenação cronológica dos eventos
- * na agenda de simulação.
+ * Todo evento possui um tempo de execução (em minutos desde o início da simulação) e
+ * deve implementar o método {@link #executar()} para definir seu comportamento.
  *
  * @see Comparable
  */
 public abstract class Evento implements Comparable<Evento> {
+
     /**
-     * O tempo em minutos quando o evento deve ocorrer na simulação
+     * O tempo (em minutos) em que o evento está agendado para ocorrer.
      */
     protected int tempo;
 
     /**
-     * Constrói um novo Evento com o tempo especificado.
+     * Construtor da classe base {@code Evento}.
      *
-     * @param tempo O tempo em minutos quando o evento ocorrerá na simulação
+     * @param tempo o tempo (em minutos desde o início da simulação) em que o evento deve ocorrer
      * @throws IllegalArgumentException se o tempo for negativo
      */
     public Evento(int tempo) {
@@ -31,31 +32,31 @@ public abstract class Evento implements Comparable<Evento> {
     }
 
     /**
-     * Retorna o tempo agendado para este evento.
+     * Retorna o tempo em que este evento está agendado para ocorrer.
      *
-     * @return O tempo em minutos quando este evento ocorrerá
+     * @return o tempo (em minutos) de execução do evento
      */
     public int getTempo() {
         return tempo;
     }
 
     /**
-     * Método abstrato que contém a lógica específica de execução do evento.
+     * Executa a lógica associada ao evento.
      * <p>
-     * Deve ser implementado pelas subclasses para definir o comportamento
-     * específico de cada tipo de evento.
+     * Cada tipo de evento deve implementar este método com seu comportamento específico.
      */
     public abstract void executar();
 
     /**
-     * Compara este evento com outro evento baseado no tempo de ocorrência.
+     * Compara dois eventos com base no tempo de ocorrência.
      * <p>
-     * Permite a ordenação cronológica dos eventos na agenda de simulação.
+     * Permite a ordenação automática dos eventos em listas ordenadas, como a agenda da simulação.
      *
-     * @param outro O outro evento a ser comparado
-     * @return Um valor negativo, zero ou positivo se este evento for anterior,
-     * simultâneo ou posterior ao evento comparado, respectivamente
-     * @throws NullPointerException se o outro evento for null
+     * @param outro o outro evento a ser comparado
+     * @return valor negativo se este evento ocorrer antes do outro,
+     *         zero se forem simultâneos,
+     *         positivo se ocorrer depois
+     * @throws NullPointerException se o evento comparado for {@code null}
      */
     @Override
     public int compareTo(Evento outro) {
