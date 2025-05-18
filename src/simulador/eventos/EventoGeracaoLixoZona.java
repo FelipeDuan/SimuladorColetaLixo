@@ -2,6 +2,14 @@ package simulador.eventos;
 
 import simulador.zona.Zona;
 
+/**
+ * (Não utilizado)
+ * <p>
+ * Evento responsável por simular a geração diária de lixo em uma determinada zona da cidade.
+ * <p>
+ * Quando executado, aumenta a quantidade de lixo acumulado na zona, de acordo com
+ * os parâmetros definidos para ela.
+ */
 public class EventoGeracaoLixoZona extends Evento {
     private Zona zona;
 
