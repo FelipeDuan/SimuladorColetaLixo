@@ -62,6 +62,11 @@ public class CaminhaoPequeno {
         return id;
     }
 
+    /**
+     * Retorna a carga atual do caminhão.
+     *
+     * @return carga atual em toneladas
+     */
     public int getCargaAtual() {
         return cargaAtual;
     }
