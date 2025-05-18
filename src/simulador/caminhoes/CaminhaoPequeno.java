@@ -1,5 +1,6 @@
 package simulador.caminhoes;
 
+import simulador.eventos.EventoGerarCaminhaoGrande;
 import simulador.zona.Zona;
 
 public class CaminhaoPequeno {
@@ -8,7 +9,9 @@ public class CaminhaoPequeno {
     private int capacidadeMaxima;
     private int cargaAtual;
     private int numeroDeViagensDiarias;
-    private Zona zonaAlvo; // <- NOVO ATRIBUTO
+    private Zona zonaAlvo;
+    private EventoGerarCaminhaoGrande eventoAgendado;
+
 
     public CaminhaoPequeno(String id, int capacidadeMaxima, int numeroDeViagensDiarias, Zona zonaAlvo) {
         this.id = id;
@@ -36,6 +39,14 @@ public class CaminhaoPequeno {
 
     public Zona getZonaAlvo() {
         return zonaAlvo;
+    }
+
+    public EventoGerarCaminhaoGrande getEventoAgendado() {
+        return eventoAgendado;
+    }
+
+    public void setEventoAgendado(EventoGerarCaminhaoGrande eventoAgendado) {
+        this.eventoAgendado = eventoAgendado;
     }
 
     public boolean coletar(int quantidade) {

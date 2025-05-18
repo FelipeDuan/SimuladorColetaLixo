@@ -25,6 +25,11 @@ public class AgendaEventos {
         });
     }
 
+
+    public static boolean removerEvento(Evento evento) {
+        return eventos.removerProcurado(evento);
+    }
+
     /**
      * Processa todos os eventos na agenda em ordem cronológica
      */

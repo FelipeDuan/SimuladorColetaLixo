@@ -150,6 +150,40 @@ public class Lista<T> {
         return true;
     }
 
+    public boolean removerProcurado(T elemento) {
+    if (elemento == null || head == null) return false;
+
+    No<T> atual = head;
+
+    while (atual != null) {
+        if (atual.getValor().equals(elemento)) {
+            // Caso 1: elemento é o head
+            if (atual == head) {
+                head = atual.getProx();
+                if (head != null) head.setPrev(null);
+            }
+            // Caso 2: elemento é o tail
+            else if (atual == tail) {
+                tail = atual.getPrev();
+                if (tail != null) tail.setProx(null);
+            }
+            // Caso 3: meio da lista
+            else {
+                atual.getPrev().setProx(atual.getProx());
+                atual.getProx().setPrev(atual.getPrev());
+            }
+
+            tamanho--;
+            return true;
+        }
+
+        atual = atual.getProx();
+    }
+
+    return false; // elemento não encontrado
+}
+
+
     // ========== MÉTODOS DE CONSULTA ==========
 
     /**

@@ -25,8 +25,6 @@ public class EventoEstacaoTransferencia extends Evento{
 
     @Override
     public void executar() {
-        System.out.println( ConsoleCor.ROXO + "====================== E S T A Ç Ã O ======================");
-        System.out.printf("[%s] \n", TempoUtil.formatarHorarioSimulado(tempo));
         estacao.receberCaminhaoPequeno(caminhao, tempo);
     }
 }
