@@ -89,6 +89,11 @@ public class CaminhaoPequeno {
         return eventoAgendado;
     }
 
+    /**
+     * Define o evento de geração de caminhão grande vinculado a este caminhão.
+     *
+     * @param eventoAgendado o evento a ser vinculado
+     */
     public void setEventoAgendado(EventoGerarCaminhaoGrande eventoAgendado) {
         this.eventoAgendado = eventoAgendado;
     }
