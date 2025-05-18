@@ -3,6 +3,12 @@ package simulador.caminhoes;
 import simulador.eventos.EventoGerarCaminhaoGrande;
 import simulador.zona.Zona;
 
+/**
+ * Representa um caminhão pequeno responsável por coletar lixo nas zonas urbanas.
+ * <p>
+ * Cada caminhão possui uma capacidade máxima, um número limitado de viagens diárias
+ * e está associado a uma zona específica de coleta.
+ */
 public class CaminhaoPequeno {
 
     private String id;
