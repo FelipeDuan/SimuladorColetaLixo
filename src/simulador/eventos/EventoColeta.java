@@ -16,6 +16,13 @@ public class EventoColeta extends Evento {
     private CaminhaoPequeno caminhao;
     private Zona zonaAtual;
 
+    /**
+     * Construtor do evento de coleta.
+     *
+     * @param tempo     o tempo em que o evento será executado (em minutos desde o início da simulação)
+     * @param caminhao  o caminhão pequeno responsável pela coleta
+     * @param zona      a zona alvo da coleta
+     */
     public EventoColeta(int tempo, CaminhaoPequeno caminhao, Zona zona) {
         super(tempo);
         this.caminhao = caminhao;
