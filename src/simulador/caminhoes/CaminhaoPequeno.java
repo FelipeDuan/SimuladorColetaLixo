@@ -114,6 +114,9 @@ public class CaminhaoPequeno {
         return false;
     }
 
+    /**
+     * Descarrega totalmente o caminhão (zera a carga atual).
+     */
     public void descarregar() {
         this.cargaAtual = 0;
     }
