@@ -59,6 +59,10 @@ public class CaminhaoPequeno {
         return false;
     }
 
+    public void descarregar() {
+        this.cargaAtual = 0;
+    }
+
     public boolean podeRealizarNovaViagem() {
         return numeroDeViagensDiarias > 0;
     }

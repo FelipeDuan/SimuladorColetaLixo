@@ -10,8 +10,6 @@ import java.util.Map;
 public class GerenciadorCaminhoes {
 
     private EstacaoDeTransferencia estacao;
-    private final Map<CaminhaoPequeno, EventoGerarCaminhaoGrande> eventosAgendados = new HashMap<>();
-    private EventoGerarCaminhaoGrande eventoAgendado;
 
     public GerenciadorCaminhoes(EstacaoDeTransferencia estacao) {
         this.estacao = estacao;
@@ -31,7 +29,4 @@ public class GerenciadorCaminhoes {
         }
     }
 
-    public void eventoExecutado() {
-        eventoAgendado = null; // Evento disparado; libera novo agendamento
-    }
 }

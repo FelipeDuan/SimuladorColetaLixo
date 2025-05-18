@@ -1,9 +1,9 @@
 package simulador.estacoes;
 
-import java.util.LinkedList;
-
+import estruturas.lista.Fila;
 import simulador.caminhoes.CaminhaoGrande;
 import simulador.caminhoes.CaminhaoPequeno;
+import simulador.configuracao.ParametrosSimulacao;
 import simulador.eventos.AgendaEventos;
 import simulador.eventos.EventoGerarCaminhaoGrande;
 import simulador.util.ConsoleCor;
@@ -11,9 +11,9 @@ import simulador.util.TempoUtil;
 
 public class EstacaoDeTransferencia {
     public String nomeEstacao;
-    private LinkedList<CaminhaoPequeno> filaCaminhoes = new LinkedList<>();
-
     private CaminhaoGrande caminhaoGrandeAtual;
+    private Fila<CaminhaoPequeno> filaCaminhoes = new Fila<>();
+
 
     public EstacaoDeTransferencia(String nomeEstacao) {
         this.nomeEstacao = nomeEstacao;
@@ -30,7 +30,7 @@ public class EstacaoDeTransferencia {
         return nomeEstacao;
     }
 
-    public LinkedList<CaminhaoPequeno> getFilaCaminhoes() {
+    public Fila<CaminhaoPequeno> getFilaCaminhoes() {
         return filaCaminhoes;
     }
 
@@ -44,7 +44,7 @@ public class EstacaoDeTransferencia {
         System.out.printf("  • Caminhão pequeno %s chegou.%n", caminhao.getId());
 
         if (caminhaoGrandeAtual == null || caminhaoGrandeAtual.estaCheio()) {
-            filaCaminhoes.add(caminhao);
+            filaCaminhoes.enqueue(caminhao);
             System.out.printf("  • Fila de espera aumentou. Tamanho: %d%n", filaCaminhoes.size());
 
             if (caminhao.getEventoAgendado() == null) {
@@ -62,8 +62,15 @@ public class EstacaoDeTransferencia {
             }
 
             int carga = caminhao.getCargaAtual();
+            int tempoDescarga = carga * ParametrosSimulacao.TEMPO_DESCARGA_POR_TONELADA;
+
+            System.out.printf("  • Tempo de descarregamento: %s%n", TempoUtil.formatarDuracao(tempoDescarga));
+            System.out.printf("[ESTAÇÃO %s]  • Caminhão pequeno %s da fila descarregou %d toneladas.%n",
+                    nomeEstacao, caminhao.getId(), carga);
+
             caminhaoGrandeAtual.receberCarga(carga);
-            System.out.printf("  • Descarregou %d toneladas no caminhão grande.%n", carga);
+            caminhao.descarregar();
+
 
             if (caminhaoGrandeAtual.estaCheio()) {
                 System.out.println("  • Caminhão grande cheio!");
@@ -90,5 +97,4 @@ public class EstacaoDeTransferencia {
             System.out.printf("[ESTAÇÃO %s] Caminhão pequeno %s da fila descarregou %d toneladas.%n", nomeEstacao, caminhaoFila.getId(), carga);
         }
     }
-
 }

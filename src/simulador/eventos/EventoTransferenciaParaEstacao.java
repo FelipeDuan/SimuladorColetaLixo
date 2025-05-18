@@ -33,17 +33,17 @@ public class EventoTransferenciaParaEstacao extends Evento {
         EstacaoDeTransferencia estacaoDestino = MapeadorZonas.getEstacaoPara(zonaOrigem);
 
         // 2) obtém o tempo atual da simulação
-        int tempoAtual = getTempo();  // tempo deste evento, em minutos
+        int tempoAtual = getTempo();
 
-        // 3) obtém a carga atual do caminhão (assumindo que há um método getCargaAtual)
-        int cargaAtual = caminhaoPequeno.getCargaAtual();  // substitua pelo método correto
+        // 3) obtém a carga atual do caminhão
+        int cargaAtual = caminhaoPequeno.getCargaAtual();
 
         // 4) calcula o tempo total considerando que está carregado e horário de pico
         TempoDetalhado tempoDetalhado = TempoUtil.calcularTempoDetalhado(tempoAtual, cargaAtual, true);
 
-        // 6) log para debug / info
+        //5) log para debug / info
         System.out.println(ConsoleCor.AZUL + "================ T R A N S F E R Ê N C I A ===============");
-        System.out.printf("[%s] \n", TempoUtil.formatarHorarioSimulado(tempoAtual + 1));
+        System.out.printf("[%s] \n", TempoUtil.formatarHorarioSimulado(tempoAtual));
         System.out.printf("Caminhão %s → Estação %s%n", caminhaoPequeno.getId(), estacaoDestino.getNomeEstacao());
         System.out.printf("  • Tempo de trajeto: %s%n", TempoUtil.formatarDuracao(tempoDetalhado.tempoDeslocamento));
         if (tempoDetalhado.tempoExtraCarregado > 0) {
@@ -54,6 +54,5 @@ public class EventoTransferenciaParaEstacao extends Evento {
         System.out.println();
 
         AgendaEventos.adicionarEvento(new EventoEstacaoTransferencia((tempoAtual + tempoDetalhado.tempoTotal), estacaoDestino, caminhaoPequeno));
-
     }
 }
