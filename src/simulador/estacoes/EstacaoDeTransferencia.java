@@ -30,6 +30,11 @@ public class EstacaoDeTransferencia {
         this.caminhaoGrandeAtual = new CaminhaoGrande();
     }
 
+    /**
+     * Gera um novo caminhão grande e tenta descarregar a fila de espera.
+     *
+     * @param tempoAtual tempo atual da simulação (em minutos)
+     */
     public void gerarNovoCaminhaoGrande(int tempoAtual) {
         this.caminhaoGrandeAtual = new CaminhaoGrande();
         System.out.println("[ESTAÇÃO " + nomeEstacao + "] Novo caminhão grande criado.");
