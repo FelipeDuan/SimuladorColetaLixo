@@ -98,6 +98,12 @@ public class CaminhaoPequeno {
         this.eventoAgendado = eventoAgendado;
     }
 
+    /**
+     * Realiza a coleta de uma quantidade de lixo.
+     *
+     * @param quantidade a quantidade a ser coletada
+     * @return {@code true} se a coleta foi bem-sucedida, {@code false} se ultrapassou a capacidade
+     */
     public boolean coletar(int quantidade) {
         if (cargaAtual + quantidade <= capacidadeMaxima) {
             cargaAtual += quantidade;
