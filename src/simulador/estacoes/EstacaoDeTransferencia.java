@@ -41,6 +41,11 @@ public class EstacaoDeTransferencia {
         descarregarFilaEspera(tempoAtual);
     }
 
+    /**
+     * Retorna o nome da estação de transferência.
+     *
+     * @return nome da estação
+     */
     public String getNomeEstacao() {
         return nomeEstacao;
     }
