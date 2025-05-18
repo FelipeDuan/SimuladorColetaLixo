@@ -32,9 +32,9 @@ public abstract class Evento implements Comparable<Evento> {
     }
 
     /**
-     * Retorna o tempo agendado para este evento.
+     * Retorna o tempo em que este evento está agendado para ocorrer.
      *
-     * @return O tempo em minutos quando este evento ocorrerá
+     * @return o tempo (em minutos) de execução do evento
      */
     public int getTempo() {
         return tempo;
