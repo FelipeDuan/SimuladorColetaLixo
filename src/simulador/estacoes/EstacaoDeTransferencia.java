@@ -82,7 +82,7 @@ public class EstacaoDeTransferencia {
     public void receberCaminhaoPequeno(CaminhaoPequeno caminhao, int tempoAtual) {
         System.out.println(ConsoleCor.ROXO + "====================== E S T A Ç Ã O ======================");
         System.out.printf("[%s]%n", TempoUtil.formatarHorarioSimulado(tempoAtual));
-        System.out.printf("[%s | Caminhão %s]%n", nomeEstacao, caminhao.getId());
+        System.out.printf("[Estação %s | Caminhão %s]%n", nomeEstacao, caminhao.getId());
         System.out.println("  → Chegada confirmada.");
 
         // Caso não haja caminhão grande ou ele esteja cheio
