@@ -23,6 +23,12 @@ public class EventoGerarCaminhaoGrande extends Evento {
         this.estacao = estacao;
     }
 
+    /**
+     * Executa a lógica de geração de caminhão grande.
+     * <p>
+     * Verifica se a estação ainda está sem caminhão grande disponível e,
+     * caso afirmativo, instancia um novo caminhão para atender os caminhões pequenos em fila.
+     */
     @Override
     public void executar() {
 
