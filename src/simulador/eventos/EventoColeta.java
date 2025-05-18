@@ -6,6 +6,12 @@ import simulador.util.TempoDetalhado;
 import simulador.util.TempoUtil;
 import simulador.zona.Zona;
 
+/**
+ * Evento responsável por realizar a coleta de lixo em uma zona específica por um caminhão pequeno.
+ * <p>
+ * Executa o processo de coleta conforme a capacidade do caminhão e a quantidade de lixo disponível.
+ * Dependendo do resultado, agenda um novo evento de coleta ou transfere o caminhão para a estação.
+ */
 public class EventoColeta extends Evento {
     private CaminhaoPequeno caminhao;
     private Zona zonaAtual;
