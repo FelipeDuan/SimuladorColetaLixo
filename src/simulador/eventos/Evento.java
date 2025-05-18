@@ -48,14 +48,15 @@ public abstract class Evento implements Comparable<Evento> {
     public abstract void executar();
 
     /**
-     * Compara este evento com outro evento baseado no tempo de ocorrência.
+     * Compara dois eventos com base no tempo de ocorrência.
      * <p>
-     * Permite a ordenação cronológica dos eventos na agenda de simulação.
+     * Permite a ordenação automática dos eventos em listas ordenadas, como a agenda da simulação.
      *
-     * @param outro O outro evento a ser comparado
-     * @return Um valor negativo, zero ou positivo se este evento for anterior,
-     * simultâneo ou posterior ao evento comparado, respectivamente
-     * @throws NullPointerException se o outro evento for null
+     * @param outro o outro evento a ser comparado
+     * @return valor negativo se este evento ocorrer antes do outro,
+     *         zero se forem simultâneos,
+     *         positivo se ocorrer depois
+     * @throws NullPointerException se o evento comparado for {@code null}
      */
     @Override
     public int compareTo(Evento outro) {
