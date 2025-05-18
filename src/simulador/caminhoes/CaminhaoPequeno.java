@@ -130,6 +130,10 @@ public class CaminhaoPequeno {
         return numeroDeViagensDiarias > 0;
     }
 
+    /**
+     * Registra uma viagem realizada, decrementando o contador de viagens restantes.
+     * Exibe no console o número de viagens restantes.
+     */
     public void registrarViagem() {
         if (numeroDeViagensDiarias > 0) {
             numeroDeViagensDiarias--;
