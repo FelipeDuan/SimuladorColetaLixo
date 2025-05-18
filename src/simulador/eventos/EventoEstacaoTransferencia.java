@@ -41,6 +41,11 @@ public class EventoEstacaoTransferencia extends Evento{
                 TempoUtil.formatarHorarioSimulado(tempo));
     }
 
+    /**
+     * Executa o evento, enviando o caminhão pequeno para a estação de transferência.
+     * <p>
+     * A estação decide se o caminhão será imediatamente descarregado ou adicionado à fila.
+     */
     @Override
     public void executar() {
         estacao.receberCaminhaoPequeno(caminhao, tempo);
