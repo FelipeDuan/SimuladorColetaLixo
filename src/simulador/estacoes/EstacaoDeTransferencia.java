@@ -130,6 +130,13 @@ public class EstacaoDeTransferencia {
         }
     }
 
+    /**
+     * Tenta descarregar todos os caminhões da fila de espera no caminhão grande atual.
+     * <p>
+     * Remove os caminhões da fila e os descarrega até que o caminhão grande fique cheio ou a fila esvazie.
+     *
+     * @param tempoAtual tempo atual da simulação (em minutos)
+     */
     private void descarregarFilaEspera(int tempoAtual) {
         while (!filaCaminhoes.isEmpty() && !caminhaoGrandeAtual.estaCheio()) {
             CaminhaoPequeno caminhaoFila = filaCaminhoes.poll();
