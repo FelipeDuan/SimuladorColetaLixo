@@ -16,6 +16,9 @@ public class CaminhaoGrande {
     private boolean carregando;
     private int tempoMaximoEspera;
 
+    /**
+     * Construtor padrão que inicializa o caminhão com ID automático e carga zerada.
+     */
     public CaminhaoGrande() {
         this.id = contadorIds++;
         this.cargaAtual = 0;
