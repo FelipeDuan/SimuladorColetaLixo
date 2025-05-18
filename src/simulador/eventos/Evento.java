@@ -4,16 +4,17 @@ package simulador.eventos;
  * Classe abstrata que representa um evento genérico no simulador.
  * <p>
  * Esta classe serve como base para todos os tipos de eventos no sistema de simulação,
- * fornecendo a estrutura básica para ordenação e execução de eventos.
+ * fornecendo a estrutura necessária para ordenação cronológica e execução de lógica específica.
  * <p>
- * Implementa {@code Comparable<Evento>} para permitir a ordenação cronológica dos eventos
- * na agenda de simulação.
+ * Todo evento possui um tempo de execução (em minutos desde o início da simulação) e
+ * deve implementar o método {@link #executar()} para definir seu comportamento.
  *
  * @see Comparable
  */
 public abstract class Evento implements Comparable<Evento> {
+
     /**
-     * O tempo em minutos quando o evento deve ocorrer na simulação
+     * O tempo (em minutos) em que o evento está agendado para ocorrer.
      */
     protected int tempo;
 
