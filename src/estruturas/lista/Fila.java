@@ -102,6 +102,11 @@ public class Fila<T> {
         return head == null;
     }
 
+    /**
+     * (Não utilizado)
+     * <p>
+     * Exibe todos os elementos da fila em ordem, da cabeça até o fim.
+     */
     public void printQueue() {
         if (head == null) {
             System.out.println("Fila vazia");
