@@ -70,6 +70,15 @@ public class EstacaoDeTransferencia {
         return caminhaoGrandeAtual != null && !caminhaoGrandeAtual.estaCheio();
     }
 
+    /**
+     * Lida com a chegada de um caminhão pequeno na estação.
+     * <p>
+     * Se houver caminhão grande disponível, realiza o descarregamento. Caso contrário, adiciona à fila
+     * e agenda um evento futuro para gerar novo caminhão grande se necessário.
+     *
+     * @param caminhao o caminhão pequeno que chegou
+     * @param tempoAtual tempo atual da simulação (em minutos)
+     */
     public void receberCaminhaoPequeno(CaminhaoPequeno caminhao, int tempoAtual) {
         System.out.println(ConsoleCor.ROXO + "====================== E S T A Ç Ã O ======================");
         System.out.printf("[%s]%n", TempoUtil.formatarHorarioSimulado(tempoAtual));
