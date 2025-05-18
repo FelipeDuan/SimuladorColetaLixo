@@ -1,5 +1,10 @@
 package estruturas.lista;
 
+/**
+ * Implementação de uma fila genérica (FIFO) com base em nós encadeados.
+ *
+ * @param <T> o tipo de elementos armazenados na fila
+ */
 public class Fila<T> {
     private static class No<T> {
         T valor;
