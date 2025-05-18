@@ -25,6 +25,11 @@ public class CaminhaoGrande {
         this.carregando = true;
     }
 
+    /**
+     * Retorna o identificador único do caminhão.
+     *
+     * @return o ID do caminhão
+     */
     public int getId() {
         return id;
     }
