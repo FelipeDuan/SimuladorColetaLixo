@@ -7,17 +7,17 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Classe utilitária para conversão e cálculo de tempos na simulação.
  * <p>
- * Fornece métodos para manipulação e transformação de unidades de tempo
- * utilizadas no sistema de simulação.
+ * Fornece métodos para manipulação, formatação e estimativa de tempos com base nas regras
+ * de operação da coleta, horários de pico e deslocamento urbano.
  */
 public class TempoUtil {
 
     /**
-     * Converte os minutos decorridos desde o início da simulação (07:00)
-     * em um horário real no formato "HH:mm".
+     * Converte os minutos decorridos desde o início da simulação (às 07:00)
+     * para uma representação de horário real no formato "HH:mm".
      *
-     * @param minutosDecorridos total de minutos desde as 07:00
-     * @return String no formato "HH:mm", representando o horário simulado
+     * @param minutosDecorridos tempo desde as 07:00 (minutos)
+     * @return String com o horário simulado formatado
      * @throws IllegalArgumentException se minutosDecorridos for negativo
      */
     public static String formatarHorarioSimulado(int minutosDecorridos) {
@@ -30,7 +30,12 @@ public class TempoUtil {
     }
 
     /**
-     * Converte uma duração (em minutos) para a forma "Xh Ym" ou "Z min"
+     * Converte uma duração (em minutos) para uma representação textual amigável.
+     * <p>
+     * Exemplo: 135 → "2h 15min"
+     *
+     * @param duracaoMinutos duração total em minutos
+     * @return String formatada como "Xh Ym" ou "Zmin"
      */
     public static String formatarDuracao(int duracaoMinutos) {
         int horas = duracaoMinutos / 60;
@@ -43,17 +48,14 @@ public class TempoUtil {
     }
 
     /**
-     * Calcula o tempo real de viagem considerando horários de pico.
+     * Calcula o tempo real de viagem considerando os horários de pico.
      * <p>
-     * Aplica multiplicadores de tempo baseado no horário da simulação:
-     * <ul>
-     *   <li>Horário de pico: tempo prolongado</li>
-     *   <li>Fora de pico: tempo normal</li>
-     * </ul>
+     * Para cada minuto da viagem base, aplica o multiplicador de tempo correspondente
+     * ao horário atual da simulação (pico ou fora de pico).
      *
-     * @param tempoAtual  Minutos decorridos desde o início da simulação
-     * @param duracaoBase Duração base da viagem em minutos (sem considerar pico)
-     * @return Tempo total ajustado em minutos
+     * @param tempoAtual  tempo atual da simulação (em minutos)
+     * @param duracaoBase duração da viagem em minutos (sem considerar pico)
+     * @return duração total ajustada com multiplicadores de tráfego
      * @throws IllegalArgumentException se qualquer parâmetro for negativo
      */
     public static int calcularTempoRealDeViagem(int tempoAtual, int duracaoBase) {
@@ -81,23 +83,31 @@ public class TempoUtil {
     }
 
     /**
-     * Calcula o tempo total (coleta + deslocamento), considerando carga, pico e se o caminhão está carregado.
+     * Calcula o tempo total de uma operação de coleta ou transferência.
+     * <p>
+     * Considera tempo de coleta (se não estiver carregado), deslocamento com base
+     * em horário de pico, e um tempo extra se o caminhão estiver carregado.
      *
-     * @param tempoAtual     Tempo da simulação atual (em minutos)
-     * @param cargaToneladas Quantidade coletada ou transportada
-     * @param carregado      true se o caminhão estiver carregado (indo para estação), false se estiver coletando
-     * @return Tempo total da operação em minutos
+     * @param tempoAtual     tempo atual da simulação (minutos desde as 07:00)
+     * @param cargaToneladas quantidade transportada ou coletada (em toneladas)
+     * @param carregado      {@code true} se o caminhão estiver indo descarregar na estação
+     * @return instância de {@link TempoDetalhado} com os tempos de coleta, deslocamento e total
      */
     public static TempoDetalhado calcularTempoDetalhado(int tempoAtual, int cargaToneladas, boolean carregado) {
         boolean pico = ParametrosSimulacao.isHorarioDePico(tempoAtual);
+
         int min = pico ? ParametrosSimulacao.TEMPO_MIN_PICO : ParametrosSimulacao.TEMPO_MIN_FORA_PICO;
         int max = pico ? ParametrosSimulacao.TEMPO_MAX_PICO : ParametrosSimulacao.TEMPO_MAX_FORA_PICO;
+
+        // Tempo de deslocamento básico aleatório entre mínimo e máximo
         int tempoBase = ThreadLocalRandom.current().nextInt(min, max + 1);
 
         int tempoDeslocamento = calcularTempoRealDeViagem(tempoAtual, tempoBase);
 
+        // Tempo de coleta só é considerado se o caminhão estiver coletando
         int tempoColeta = carregado ? 0 : cargaToneladas * ParametrosSimulacao.TEMPO_COLETA_POR_TONELADA;
 
+        // Tempo extra simula lentidão por peso ao estar carregado
         int tempoExtraCarregado = carregado ? (int) (tempoDeslocamento * 0.3) : 0;
 
         return new TempoDetalhado(tempoColeta, tempoDeslocamento, tempoExtraCarregado);
