@@ -80,6 +80,11 @@ public class CaminhaoPequeno {
         return zonaAlvo;
     }
 
+    /**
+     * Retorna o evento de geração de caminhão grande vinculado a este caminhão.
+     *
+     * @return evento agendado ou {@code null}
+     */
     public EventoGerarCaminhaoGrande getEventoAgendado() {
         return eventoAgendado;
     }
