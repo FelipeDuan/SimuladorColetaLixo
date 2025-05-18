@@ -121,6 +121,11 @@ public class CaminhaoPequeno {
         this.cargaAtual = 0;
     }
 
+    /**
+     * Verifica se o caminhão ainda pode realizar viagens no dia.
+     *
+     * @return {@code true} se ainda restam viagens, {@code false} caso contrário
+     */
     public boolean podeRealizarNovaViagem() {
         return numeroDeViagensDiarias > 0;
     }
