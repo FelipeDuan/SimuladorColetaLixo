@@ -26,9 +26,9 @@ public class Simulador {
         leste.gerarLixoDiario();
         System.out.println();
 
-        CaminhaoPequeno c1 = new CaminhaoPequeno("1", 4, 2);
+        CaminhaoPequeno c1 = new CaminhaoPequeno("1", 4, 2, leste);
 
-        AgendaEventos.adicionarEvento(new EventoColeta(0, c1, leste));
+        AgendaEventos.adicionarEvento(new EventoColeta(0, c1, c1.getZonaAlvo()));
 
         AgendaEventos.processarEventos();
 

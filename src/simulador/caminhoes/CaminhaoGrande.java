@@ -1,38 +1,47 @@
 package simulador.caminhoes;
 
 public class CaminhaoGrande {
-    public int id;
-    public int numeroViagens;
-    public boolean emViagem;
-    protected int capacidadeMaxima = 20000;
-    protected int cargaAtual;
-    public boolean carregando;
+    private static int contadorIds = 1;  // para gerar id automático
+    private int id;
+    private final int capacidadeMaxima = 20000;
+    private int cargaAtual;
+    private boolean carregando;
+    private int tempoMaximoEspera;
 
     public CaminhaoGrande() {
+        this.id = contadorIds++;
         this.cargaAtual = 0;
+        this.carregando = true;
     }
 
-    public boolean prontoParaPartir() {
+    public int getId() {
+        return id;
+    }
+
+    public int getCargaAtual() {
+        return cargaAtual;
+    }
+
+    public int getCapacidadeMaxima() {
+        return capacidadeMaxima;
+    }
+
+    public boolean estaCheio() {
         return cargaAtual >= capacidadeMaxima;
     }
 
     public void receberCarga(int quantidade) {
-        cargaAtual += quantidade;
+        if (cargaAtual + quantidade > capacidadeMaxima) {
+            cargaAtual = capacidadeMaxima;
+        } else {
+            cargaAtual += quantidade;
+        }
     }
 
     public void descarregar() {
-        System.out.println("Caminhão grande partiu para o aterro com " + cargaAtual + "kg.");
+        System.out.println("Caminhão grande #" + id + " partiu para o aterro com " + cargaAtual + " unidades de carga.");
         cargaAtual = 0;
-        // vai até o aterro
-        /*
-         * - Tem tolerância de Espera
-         * - Se for excedida, parte para o aterro sanitário
-         * - Se estiver vazio, aguarda até ser carregado
-         */
+        carregando = false;
     }
 
-    public boolean aguardarCarregamento() {
-        // esperando o carregamento
-        return true;
-    }
 }

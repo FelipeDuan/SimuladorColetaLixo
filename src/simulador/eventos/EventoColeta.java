@@ -31,6 +31,17 @@ public class EventoColeta extends Evento {
         int qtdZona = zonaAtual.getLixoAcumulado();
         if (qtdZona == 0) {
             System.out.println("  • Zona está limpa. Nenhuma coleta realizada.");
+
+            // Considera como uma tentativa de viagem
+            caminhao.registrarViagem();
+
+            if (caminhao.podeRealizarNovaViagem()) {
+                // Agenda próxima tentativa (simulando tempo perdido na viagem)
+                int tempoDeEspera = 30; // ou o tempo de trajeto real
+                AgendaEventos.adicionarEvento(new EventoColeta(tempo + tempoDeEspera, caminhao, caminhao.getZonaAlvo()));
+            } else {
+                AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tempo, caminhao, caminhao.getZonaAlvo()));
+            }
             return;
         }
 
