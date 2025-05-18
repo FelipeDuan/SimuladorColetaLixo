@@ -75,6 +75,11 @@ public class Fila<T> {
         return valor;
     }
 
+    /**
+     * Versão silenciosa do {@link #dequeue()}, sem exibir mensagens.
+     *
+     * @return o valor removido, ou {@code null} se a fila estiver vazia
+     */
     public T poll() {
         if (head == null) {
             return null;
