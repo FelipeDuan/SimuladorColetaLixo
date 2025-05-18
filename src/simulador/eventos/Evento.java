@@ -41,10 +41,9 @@ public abstract class Evento implements Comparable<Evento> {
     }
 
     /**
-     * Método abstrato que contém a lógica específica de execução do evento.
+     * Executa a lógica associada ao evento.
      * <p>
-     * Deve ser implementado pelas subclasses para definir o comportamento
-     * específico de cada tipo de evento.
+     * Cada tipo de evento deve implementar este método com seu comportamento específico.
      */
     public abstract void executar();
 
