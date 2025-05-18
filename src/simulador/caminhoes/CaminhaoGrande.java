@@ -2,6 +2,12 @@ package simulador.caminhoes;
 
 import static simulador.configuracao.ParametrosSimulacao.CAMINHAO_GRANDE_20T;
 
+
+/**
+ * Representa um caminhão grande utilizado para transportar o lixo das estações de transferência até o aterro sanitário.
+ * <p>
+ * Cada caminhão grande possui um identificador único, capacidade máxima de carga e armazena o estado da sua carga atual.
+ */
 public class CaminhaoGrande {
     private static int contadorIds = 1;  // para gerar id automático
     private int id;
