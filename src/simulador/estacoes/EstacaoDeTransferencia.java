@@ -5,9 +5,13 @@ import simulador.caminhoes.CaminhaoGrande;
 import simulador.caminhoes.CaminhaoPequeno;
 import simulador.configuracao.ParametrosSimulacao;
 import simulador.eventos.AgendaEventos;
+import simulador.eventos.EventoColeta;
 import simulador.eventos.EventoGerarCaminhaoGrande;
 import simulador.util.ConsoleCor;
 import simulador.util.TempoUtil;
+import simulador.zona.GerenciadorDeRotas;
+import simulador.zona.MapeadorZonas;
+import simulador.zona.Zona;
 
 /**
  * Representa uma estação de transferência de lixo.
@@ -82,7 +86,7 @@ public class EstacaoDeTransferencia {
     public void receberCaminhaoPequeno(CaminhaoPequeno caminhao, int tempoAtual) {
         System.out.println(ConsoleCor.ROXO + "====================== E S T A Ç Ã O ======================");
         System.out.printf("[%s]%n", TempoUtil.formatarHorarioSimulado(tempoAtual));
-        System.out.printf("[%s | Caminhão %s]%n", nomeEstacao, caminhao.getId());
+        System.out.printf("[Estação %s | Caminhão %s]%n", nomeEstacao, caminhao.getId());
         System.out.println("  → Chegada confirmada.");
 
         // Caso não haja caminhão grande ou ele esteja cheio
@@ -92,11 +96,11 @@ public class EstacaoDeTransferencia {
 
             // Agenda evento de criação de caminhão grande se ainda não estiver agendado
             if (caminhao.getEventoAgendado() == null) {
-                int tempoLimite = tempoAtual + 100; // 30 minutos de espera (tolerância de 100 minutos)
+                int tempoLimite = tempoAtual + 100;
                 EventoGerarCaminhaoGrande evento = new EventoGerarCaminhaoGrande(tempoLimite, this);
                 AgendaEventos.adicionarEvento(evento);
                 caminhao.setEventoAgendado(evento);
-                System.out.printf("  • Evento para gerar caminhão grande agendado para %s%n", TempoUtil.formatarDuracao(tempoLimite));
+                System.out.printf("  • Evento para gerar caminhão grande agendado para %s%n", TempoUtil.formatarHorarioSimulado(tempoLimite));
             }
         } else {
             // Caso consiga descarregar direto
@@ -115,25 +119,47 @@ public class EstacaoDeTransferencia {
             System.out.printf("  • Descarregou: %dt    Carga: %d/%d%n", carga, caminhao.getCargaAtual(), caminhao.getCapacidadeMaxima());
             System.out.printf("  • Horário: %s     Tempo de Descarga: %s%n", TempoUtil.formatarHorarioSimulado(tempoDescarga + tempoAtual), TempoUtil.formatarDuracao(tempoDescarga));
             System.out.printf("  → Volta para atividadades %n", TempoUtil.formatarHorarioSimulado(tempoDescarga + tempoAtual));
-            // Adicionar metodo aqui
 
-            // Se caminhão grande ficou cheio, envia para o aterro
+            caminhao.registrarViagem();
+
+            if (caminhao.podeRealizarNovaViagem()) {
+                int proximoHorario = tempoAtual + tempoDescarga;
+                caminhao.atualizarZonaAlvo();
+                AgendaEventos.adicionarEvento(new EventoColeta(proximoHorario, caminhao, caminhao.getZonaAlvo()));
+            } else {
+                System.out.printf("[CAMINHÃO %s] Finalizou suas atividades do dia.%n", caminhao.getId());
+            }
+
+
+
             if (caminhaoGrandeAtual.estaCheio()) {
                 System.out.println("  • Caminhão grande cheio!");
                 System.out.println();
                 System.out.printf("[COLETA] Caminhão Grande %s → Aterro%n", caminhaoGrandeAtual.getId());
                 caminhaoGrandeAtual.descarregar();
-
-                // Tenta descarregar fila após liberar novo caminhão
                 descarregarFilaEspera(tempoAtual);
             }
         }
     }
 
+    /*
+//    private void agendarNovaColetaAposDescarga(CaminhaoPequeno caminhao, int tempoFuturo) {
+//        if (!caminhao.podeRealizarNovaViagem()) {
+//            System.out.printf("[CAMINHÃO %s] Finalizou suas atividades do dia.%n", caminhao.getId());
+//            return;
+//        }
+//
+//        // Redirecionamento após descarga (dinâmico)
+//        GerenciadorDeRotas.redirecionarSeNecessario(caminhao, tempoFuturo);
+//
+//        // Agendamento da nova coleta (independente se houve troca de zona)
+//        Zona novaZona = caminhao.getZonaAlvo();
+//        AgendaEventos.adicionarEvento(new EventoColeta(tempoFuturo, caminhao, novaZona));
+//    }
+*/
+
     /**
      * Tenta descarregar todos os caminhões da fila de espera no caminhão grande atual.
-     * <p>
-     * Remove os caminhões da fila e os descarrega até que o caminhão grande fique cheio ou a fila esvazie.
      *
      * @param tempoAtual tempo atual da simulação (em minutos)
      */

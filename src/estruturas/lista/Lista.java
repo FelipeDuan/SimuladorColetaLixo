@@ -277,4 +277,15 @@ public class Lista<T> {
         }
         System.out.println("-> NULL");
     }
+
+    /**
+     * Retorna o valor armazenado na posição indicada.
+     *
+     * @param pos posição desejada (0-based)
+     * @return valor armazenado, ou null se a posição for inválida
+     */
+    public T getValor(int pos) {
+        No<T> no = getNo(pos); // getNo já existe e percorre a lista corretamente
+        return no != null ? no.getValor() : null;
+    }
 }

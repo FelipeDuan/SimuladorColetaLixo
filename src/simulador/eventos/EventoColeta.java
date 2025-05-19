@@ -64,13 +64,20 @@ public class EventoColeta extends Evento {
             caminhao.registrarViagem();
 
             if (caminhao.podeRealizarNovaViagem()) {
-                int tempoDeEspera = 30; // Tempo de deslocamento perdido
-                AgendaEventos.adicionarEvento(new EventoColeta(tempo + tempoDeEspera, caminhao, caminhao.getZonaAlvo()));
+                boolean mudouZona = caminhao.atualizarProximaZonaAlvo();
+
+                if (mudouZona) {
+                    AgendaEventos.adicionarEvento(new EventoColeta(tempo + 30, caminhao, caminhao.getZonaAlvo()));
+                } else {
+                    System.out.println("  • Todas as zonas da rota estão limpas.");
+                    AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tempo, caminhao, zonaAtual));
+                }
             } else {
-                AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tempo, caminhao, caminhao.getZonaAlvo()));
+                AgendaEventos.adicionarEvento(new EventoTransferenciaParaEstacao(tempo, caminhao, zonaAtual));
             }
             return;
         }
+
 
         // ======================
         // CASO 2: Coleta ocorre normalmente
