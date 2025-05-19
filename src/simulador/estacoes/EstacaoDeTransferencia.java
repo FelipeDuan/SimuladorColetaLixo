@@ -1,6 +1,6 @@
 package simulador.estacoes;
 
-import estruturas.lista.Fila;
+import estruturas.filas.Fila;
 import simulador.caminhoes.CaminhaoGrande;
 import simulador.caminhoes.CaminhaoPequeno;
 import simulador.configuracao.ParametrosSimulacao;
@@ -9,9 +9,6 @@ import simulador.eventos.EventoColeta;
 import simulador.eventos.EventoGerarCaminhaoGrande;
 import simulador.util.ConsoleCor;
 import simulador.util.TempoUtil;
-import simulador.zona.GerenciadorDeRotas;
-import simulador.zona.MapeadorZonas;
-import simulador.zona.Zona;
 
 /**
  * Representa uma estação de transferência de lixo.

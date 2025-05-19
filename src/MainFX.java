@@ -1,3 +1,6 @@
+import estruturas.filas.FilaEncadeada;
+import estruturas.lista.ListaDuplamenteEncadeada;
+import estruturas.lista.No;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -9,7 +12,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.animation.*;
@@ -350,7 +352,7 @@ public class MainFX extends Application {
                     caminhao.moverPara(estacao.getPosX() + (LARGURA_ESTACAO - LARGURA_CAMINHAO_GRANDE) / 2,
                             estacao.getPosY() + ALTURA_ESTACAO - ALTURA_CAMINHAO_GRANDE - 10);
                 }
-                noEstacao = noEstacao.getProximo();
+                noEstacao = noEstacao.getProx();
             }
         }
 
@@ -392,7 +394,7 @@ public class MainFX extends Application {
         while (noCaminhao != null) {
             CaminhaoPequenoFX caminhao = noCaminhao.getValor();
             iniciarCicloColeta(caminhao);
-            noCaminhao = noCaminhao.getProximo();
+            noCaminhao = noCaminhao.getProx();
         }
     }
 
@@ -459,7 +461,7 @@ public class MainFX extends Application {
         while (noZona != null) {
             ZonaFX zona = noZona.getValor();
             zona.gerarLixo(0.05, 0.2); // Geração de 0.05 a 0.2 toneladas por ciclo
-            noZona = noZona.getProximo();
+            noZona = noZona.getProx();
         }
 
         // Atualização das estações
@@ -467,7 +469,7 @@ public class MainFX extends Application {
         while (noEstacao != null) {
             EstacaoFX estacao = noEstacao.getValor();
             estacao.processarFila();
-            noEstacao = noEstacao.getProximo();
+            noEstacao = noEstacao.getProx();
         }
 
         // Atualização das estatísticas
@@ -732,7 +734,7 @@ public class MainFX extends Application {
                 zonaPrioritaria = zona;
             }
 
-            noZona = noZona.getProximo();
+            noZona = noZona.getProx();
         }
 
         return zonaPrioritaria;
@@ -754,7 +756,7 @@ public class MainFX extends Application {
                 estacaoMenorFila = estacao;
             }
 
-            noEstacao = noEstacao.getProximo();
+            noEstacao = noEstacao.getProx();
         }
 
         return estacaoMenorFila;
@@ -1406,222 +1408,4 @@ public class MainFX extends Application {
     /**
      * Classe que representa um nó em uma estrutura encadeada
      */
-    private class No<T> {
-        private T valor;
-        private No<T> anterior;
-        private No<T> proximo;
-
-        public No(T valor) {
-            this.valor = valor;
-            this.anterior = null;
-            this.proximo = null;
-        }
-
-        public T getValor() {
-            return valor;
-        }
-
-        public void setValor(T valor) {
-            this.valor = valor;
-        }
-
-        public No<T> getAnterior() {
-            return anterior;
-        }
-
-        public void setAnterior(No<T> anterior) {
-            this.anterior = anterior;
-        }
-
-        public No<T> getProximo() {
-            return proximo;
-        }
-
-        public void setProximo(No<T> proximo) {
-            this.proximo = proximo;
-        }
-    }
-
-    /**
-     * Implementação de uma lista duplamente encadeada
-     */
-    private class ListaDuplamenteEncadeada<T> {
-        private No<T> primeiro;
-        private No<T> ultimo;
-        private int tamanho;
-
-        public ListaDuplamenteEncadeada() {
-            this.primeiro = null;
-            this.ultimo = null;
-            this.tamanho = 0;
-        }
-
-        public void adicionar(T valor) {
-            No<T> novoNo = new No<>(valor);
-
-            if (estaVazia()) {
-                primeiro = novoNo;
-                ultimo = novoNo;
-            } else {
-                ultimo.setProximo(novoNo);
-                novoNo.setAnterior(ultimo);
-                ultimo = novoNo;
-            }
-
-            tamanho++;
-        }
-
-        public void adicionarInicio(T valor) {
-            No<T> novoNo = new No<>(valor);
-
-            if (estaVazia()) {
-                primeiro = novoNo;
-                ultimo = novoNo;
-            } else {
-                novoNo.setProximo(primeiro);
-                primeiro.setAnterior(novoNo);
-                primeiro = novoNo;
-            }
-
-            tamanho++;
-        }
-
-        public T remover(int indice) {
-            if (estaVazia() || indice < 0 || indice >= tamanho) {
-                return null;
-            }
-
-            No<T> noAtual;
-
-            if (indice == 0) {
-                // Remoção do primeiro elemento
-                noAtual = primeiro;
-                primeiro = primeiro.getProximo();
-
-                if (primeiro != null) {
-                    primeiro.setAnterior(null);
-                } else {
-                    ultimo = null;
-                }
-            } else if (indice == tamanho - 1) {
-                // Remoção do último elemento
-                noAtual = ultimo;
-                ultimo = ultimo.getAnterior();
-                ultimo.setProximo(null);
-            } else {
-                // Remoção de um elemento intermediário
-                noAtual = primeiro;
-                for (int i = 0; i < indice; i++) {
-                    noAtual = noAtual.getProximo();
-                }
-
-                noAtual.getAnterior().setProximo(noAtual.getProximo());
-                noAtual.getProximo().setAnterior(noAtual.getAnterior());
-            }
-
-            tamanho--;
-            return noAtual.getValor();
-        }
-
-        public T removerInicio() {
-            return remover(0);
-        }
-
-        public T removerFim() {
-            return remover(tamanho - 1);
-        }
-
-        public T obter(int indice) {
-            if (estaVazia() || indice < 0 || indice >= tamanho) {
-                return null;
-            }
-
-            No<T> noAtual = primeiro;
-            for (int i = 0; i < indice; i++) {
-                noAtual = noAtual.getProximo();
-            }
-
-            return noAtual.getValor();
-        }
-
-        public boolean estaVazia() {
-            return tamanho == 0;
-        }
-
-        public int tamanho() {
-            return tamanho;
-        }
-
-        public No<T> getPrimeiro() {
-            return primeiro;
-        }
-
-        public No<T> getUltimo() {
-            return ultimo;
-        }
-    }
-
-    /**
-     * Implementação de uma fila encadeada
-     */
-    private class FilaEncadeada<T> {
-        private No<T> inicio;
-        private No<T> fim;
-        private int tamanho;
-
-        public FilaEncadeada() {
-            this.inicio = null;
-            this.fim = null;
-            this.tamanho = 0;
-        }
-
-        public void enfileirar(T valor) {
-            No<T> novoNo = new No<>(valor);
-
-            if (estaVazia()) {
-                inicio = novoNo;
-                fim = novoNo;
-            } else {
-                fim.setProximo(novoNo);
-                novoNo.setAnterior(fim);
-                fim = novoNo;
-            }
-
-            tamanho++;
-        }
-
-        public T desenfileirar() {
-            if (estaVazia()) {
-                return null;
-            }
-
-            No<T> noRemovido = inicio;
-            inicio = inicio.getProximo();
-
-            if (inicio != null) {
-                inicio.setAnterior(null);
-            } else {
-                fim = null;
-            }
-
-            tamanho--;
-            return noRemovido.getValor();
-        }
-
-        public T primeiro() {
-            if (estaVazia()) {
-                return null;
-            }
-
-            return inicio.getValor();
-        }
-
-        public boolean estaVazia() {
-            return tamanho == 0;
-        }
-
-        public int tamanho() {
-            return tamanho;
-        }
-    }
 }

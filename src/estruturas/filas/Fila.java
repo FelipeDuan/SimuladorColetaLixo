@@ -1,4 +1,4 @@
-package estruturas.lista;
+package estruturas.filas;
 
 /**
  * Implementação de uma fila genérica (FIFO) com base em nós encadeados.
