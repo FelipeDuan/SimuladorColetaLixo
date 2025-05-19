@@ -5,6 +5,7 @@ import simulador.caminhoes.CaminhaoGrande;
 import simulador.caminhoes.CaminhaoPequeno;
 import simulador.configuracao.ParametrosSimulacao;
 import simulador.eventos.AgendaEventos;
+import simulador.eventos.EventoColeta;
 import simulador.eventos.EventoGerarCaminhaoGrande;
 import simulador.util.ConsoleCor;
 import simulador.util.TempoUtil;
@@ -96,7 +97,7 @@ public class EstacaoDeTransferencia {
                 EventoGerarCaminhaoGrande evento = new EventoGerarCaminhaoGrande(tempoLimite, this);
                 AgendaEventos.adicionarEvento(evento);
                 caminhao.setEventoAgendado(evento);
-                System.out.printf("  • Evento para gerar caminhão grande agendado para %s%n", TempoUtil.formatarDuracao(tempoLimite));
+                System.out.printf("  • Evento para gerar caminhão grande agendado para %s%n", TempoUtil.formatarHorarioSimulado(tempoLimite));
             }
         } else {
             // Caso consiga descarregar direto
@@ -116,6 +117,23 @@ public class EstacaoDeTransferencia {
             System.out.printf("  • Horário: %s     Tempo de Descarga: %s%n", TempoUtil.formatarHorarioSimulado(tempoDescarga + tempoAtual), TempoUtil.formatarDuracao(tempoDescarga));
             System.out.printf("  → Volta para atividadades %n", TempoUtil.formatarHorarioSimulado(tempoDescarga + tempoAtual));
             // Adicionar metodo aqui
+
+            // Registra a viagem
+            caminhao.registrarViagem();
+
+            // Verifica se o caminhão ainda pode viajar
+            if (caminhao.podeRealizarNovaViagem()) {
+                // Atualiza para próxima zona da rota
+                caminhao.atualizarZonaAlvo();
+
+                // Agenda nova coleta com um pequeno tempo após o descarregamento
+                int proximoHorario = tempoAtual + tempoDescarga;
+                AgendaEventos.adicionarEvento(new EventoColeta(proximoHorario, caminhao, caminhao.getZonaAlvo()));
+            }
+
+            if (!caminhao.podeRealizarNovaViagem()) {
+                System.out.printf("[CAMINHÃO %s] Finalizou suas atividades do dia.%n", caminhao.getId());
+            }
 
             // Se caminhão grande ficou cheio, envia para o aterro
             if (caminhaoGrandeAtual.estaCheio()) {

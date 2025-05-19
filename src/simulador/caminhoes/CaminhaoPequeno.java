@@ -145,6 +145,20 @@ public class CaminhaoPequeno {
         return false;
     }
 
+    /**
+     * Atualiza a zona alvo para a próxima da rota, se houver.
+     */
+    public void atualizarZonaAlvo() {
+        if (rota == null || rota.getTamanho() == 0) return;
+
+        indiceRota++;
+        if (indiceRota >= rota.getTamanho()) {
+            indiceRota = 0; // volta para o início da rota (ou poderia encerrar)
+        }
+
+        zonaAlvo = rota.getValor(indiceRota);
+    }
+
 
     // ========== COLETA ==========
 
