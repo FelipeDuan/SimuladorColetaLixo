@@ -122,6 +122,30 @@ public class CaminhaoPequeno {
         return rota;
     }
 
+    /**
+     * Atualiza a próxima zona da rota para onde o caminhão deve ir.
+     *
+     * @return {@code true} se encontrou uma nova zona válida com lixo, {@code false} se não há mais zonas com lixo na rota.
+     */
+    public boolean atualizarProximaZonaAlvo() {
+        int tentativas = rota.getTamanho(); // Evita loop infinito
+
+        for (int i = 0; i < tentativas; i++) {
+            indiceRota = (indiceRota + 1) % rota.getTamanho();
+            Zona proximaZona = rota.getValor(indiceRota);
+
+            if (!proximaZona.estaLimpa()) {
+                zonaAlvo = proximaZona;
+                System.out.println("[CAMINHÃO " + id + "] Redirecionado para zona " + zonaAlvo.getNome());
+                return true;
+            }
+        }
+
+        // Nenhuma zona disponível com lixo
+        return false;
+    }
+
+
     // ========== COLETA ==========
 
     /**
