@@ -11,6 +11,7 @@ import simulador.util.ConsoleCor;
 import simulador.util.TempoUtil;
 import simulador.zona.GerenciadorDeRotas;
 import simulador.zona.MapeadorZonas;
+import simulador.zona.Zona;
 
 /**
  * Representa uma estação de transferência de lixo.
@@ -122,18 +123,13 @@ public class EstacaoDeTransferencia {
             caminhao.registrarViagem();
 
             if (caminhao.podeRealizarNovaViagem()) {
-                // ⚠️ Só avança se a zona ainda tiver lixo
-                if (!caminhao.getZonaAlvo().estaLimpa()) {
-                    caminhao.atualizarZonaAlvo();
-                    int proximoHorario = tempoAtual + tempoDescarga;
-                    AgendaEventos.adicionarEvento(new EventoColeta(proximoHorario, caminhao, caminhao.getZonaAlvo()));
-                } else {
-                    // 🚚 Redirecionamento para zona prioritária
-                    GerenciadorDeRotas.redirecionarSeNecessario(caminhao, tempoAtual);
-                }
+                int proximoHorario = tempoAtual + tempoDescarga;
+                caminhao.atualizarZonaAlvo();
+                AgendaEventos.adicionarEvento(new EventoColeta(proximoHorario, caminhao, caminhao.getZonaAlvo()));
             } else {
                 System.out.printf("[CAMINHÃO %s] Finalizou suas atividades do dia.%n", caminhao.getId());
             }
+
 
 
             if (caminhaoGrandeAtual.estaCheio()) {
@@ -145,6 +141,22 @@ public class EstacaoDeTransferencia {
             }
         }
     }
+
+    /*
+//    private void agendarNovaColetaAposDescarga(CaminhaoPequeno caminhao, int tempoFuturo) {
+//        if (!caminhao.podeRealizarNovaViagem()) {
+//            System.out.printf("[CAMINHÃO %s] Finalizou suas atividades do dia.%n", caminhao.getId());
+//            return;
+//        }
+//
+//        // Redirecionamento após descarga (dinâmico)
+//        GerenciadorDeRotas.redirecionarSeNecessario(caminhao, tempoFuturo);
+//
+//        // Agendamento da nova coleta (independente se houve troca de zona)
+//        Zona novaZona = caminhao.getZonaAlvo();
+//        AgendaEventos.adicionarEvento(new EventoColeta(tempoFuturo, caminhao, novaZona));
+//    }
+*/
 
     /**
      * Tenta descarregar todos os caminhões da fila de espera no caminhão grande atual.

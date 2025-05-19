@@ -20,27 +20,25 @@ public class GerenciadorDeRotas {
      * @param caminhao Caminhão a ser redirecionado
      * @param tempoAtual Tempo atual da simulação
      */
-    public static void redirecionarSeNecessario(CaminhaoPequeno caminhao, int tempoAtual) {
+    public static boolean redirecionarSeNecessario(
+            CaminhaoPequeno caminhao,
+            int tempoAtual
+    ) {
         Zona zonaAtual = caminhao.getZonaAlvo();
 
-        // Se ainda há lixo na zona atual, não redireciona
-        if (zonaAtual.getLixoAcumulado() > 0) return;
+        if (zonaAtual.getLixoAcumulado() > 0) return false;
 
-        Zona novaZona = AvaliadorDePrioridade.calcularZonaPrioritaria(
-                MapeadorZonas.getTodasZonas(),
-                MapeadorZonas.getCaminhoesAtivos()
-        );
+        Zona novaZona = AvaliadorDePrioridade.calcularZonaPrioritaria(MapeadorZonas.getTodasZonas(), MapeadorZonas.getCaminhoesAtivos());
 
         if (novaZona != null && !novaZona.equals(zonaAtual)) {
             System.out.println(ConsoleCor.CIANO + "[GERENCIADOR DE ROTAS] Caminhão " + caminhao.getId()
                     + " redirecionado para zona " + novaZona.getNome());
 
             caminhao.definirZonaAlvo(novaZona);
-
-            AgendaEventos.adicionarEvento(
-                    new EventoColeta(tempoAtual, caminhao, novaZona)
-            );
+            return true;
         }
+
+        return false;
     }
 
 }
