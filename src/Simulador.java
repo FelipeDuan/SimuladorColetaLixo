@@ -2,7 +2,6 @@ import estruturas.lista.Lista;
 import simulador.caminhoes.CaminhaoPequeno;
 import simulador.estacoes.EstacaoDeTransferencia;
 import simulador.eventos.AgendaEventos;
-import simulador.eventos.EventoColeta;
 import simulador.eventos.EventoDistribuidorDeRotas;
 import simulador.util.ConsoleCor;
 import simulador.util.TempoUtil;
@@ -39,6 +38,11 @@ public class Simulador {
 
         // 4. Inicializa caminhões e agenda os eventos iniciais
         Lista<CaminhaoPequeno> caminhoes = EventoDistribuidorDeRotas.distribuir(zonas, 5, 2);
+
+        // Passando para o mapeador
+        MapeadorZonas.setZonas(zonas);
+        MapeadorZonas.setCaminhoes(caminhoes);
+
 
         // 5. Inicia o processamento da simulação
         System.out.println(ConsoleCor.AMARELO + "=================== S I M U L A D O R ==================");

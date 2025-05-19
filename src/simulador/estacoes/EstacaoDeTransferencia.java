@@ -9,6 +9,8 @@ import simulador.eventos.EventoColeta;
 import simulador.eventos.EventoGerarCaminhaoGrande;
 import simulador.util.ConsoleCor;
 import simulador.util.TempoUtil;
+import simulador.zona.GerenciadorDeRotas;
+import simulador.zona.MapeadorZonas;
 
 /**
  * Representa uma estação de transferência de lixo.
@@ -120,12 +122,19 @@ public class EstacaoDeTransferencia {
             caminhao.registrarViagem();
 
             if (caminhao.podeRealizarNovaViagem()) {
-                caminhao.atualizarZonaAlvo();
-                int proximoHorario = tempoAtual + tempoDescarga;
-                AgendaEventos.adicionarEvento(new EventoColeta(proximoHorario, caminhao, caminhao.getZonaAlvo()));
+                // ⚠️ Só avança se a zona ainda tiver lixo
+                if (!caminhao.getZonaAlvo().estaLimpa()) {
+                    caminhao.atualizarZonaAlvo();
+                    int proximoHorario = tempoAtual + tempoDescarga;
+                    AgendaEventos.adicionarEvento(new EventoColeta(proximoHorario, caminhao, caminhao.getZonaAlvo()));
+                } else {
+                    // 🚚 Redirecionamento para zona prioritária
+                    GerenciadorDeRotas.redirecionarSeNecessario(caminhao, tempoAtual);
+                }
             } else {
                 System.out.printf("[CAMINHÃO %s] Finalizou suas atividades do dia.%n", caminhao.getId());
             }
+
 
             if (caminhaoGrandeAtual.estaCheio()) {
                 System.out.println("  • Caminhão grande cheio!");

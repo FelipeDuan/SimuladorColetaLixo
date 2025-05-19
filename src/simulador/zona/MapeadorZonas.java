@@ -1,5 +1,7 @@
 package simulador.zona;
 
+import estruturas.lista.Lista;
+import simulador.caminhoes.CaminhaoPequeno;
 import simulador.estacoes.EstacaoDeTransferencia;
 
 /**
@@ -12,6 +14,8 @@ public class MapeadorZonas {
 
     private static EstacaoDeTransferencia estacaoA;
     private static EstacaoDeTransferencia estacaoB;
+    private static Lista<Zona> zonas;
+    private static Lista<CaminhaoPequeno> caminhoes;
 
     /**
      * Define a configuração de quais zonas cada estação atende.
@@ -49,6 +53,49 @@ public class MapeadorZonas {
         }
 
         throw new IllegalArgumentException("Zona desconhecida: " + zona.getNome());
+    }
+
+    /**
+     * Salva a lista de zonas da simulação.
+     * Deve ser chamada no início da simulação.
+     *
+     * @param listaZonas lista de zonas usadas na simulação
+     */
+    public static void setZonas(Lista<Zona> listaZonas) {
+        zonas = listaZonas;
+    }
+
+    /**
+     * Salva a lista de caminhões da simulação.
+     * Deve ser chamada no início da simulação.
+     *
+     * @param listaCaminhoes lista de caminhões usados na simulação
+     */
+    public static void setCaminhoes(Lista<CaminhaoPequeno> listaCaminhoes) {
+        caminhoes = listaCaminhoes;
+    }
+
+    /**
+     * Retorna a lista completa de zonas utilizadas na simulação.
+     */
+    public static Lista<Zona> getTodasZonas() {
+        return zonas;
+    }
+
+    /**
+     * Retorna os caminhões que ainda têm viagens disponíveis.
+     */
+    public static Lista<CaminhaoPequeno> getCaminhoesAtivos() {
+        Lista<CaminhaoPequeno> ativos = new Lista<>();
+
+        for (int i = 0; i < caminhoes.getTamanho(); i++) {
+            CaminhaoPequeno caminhao = caminhoes.getValor(i);
+            if (caminhao.podeRealizarNovaViagem()) {
+                ativos.adicionar(ativos.getTamanho(), caminhao);
+            }
+        }
+
+        return ativos;
     }
 }
 

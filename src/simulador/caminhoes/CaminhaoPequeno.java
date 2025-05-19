@@ -159,6 +159,16 @@ public class CaminhaoPequeno {
         zonaAlvo = rota.getValor(indiceRota);
     }
 
+    /**
+     * Redefine a zona alvo do caminhão, ignorando a rota original.
+     * Usado em redirecionamentos automáticos de prioridade.
+     *
+     * @param novaZona nova zona prioritária atribuída ao caminhão
+     */
+    public void definirZonaAlvo(Zona novaZona) {
+        this.zonaAlvo = novaZona;
+    }
+
 
     // ========== COLETA ==========
 
