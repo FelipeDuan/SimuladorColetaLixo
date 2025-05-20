@@ -94,7 +94,8 @@ public class TempoUtil {
      * @return instância de {@link TempoDetalhado} com os tempos de coleta, deslocamento e total
      */
     public static TempoDetalhado calcularTempoDetalhado(int tempoAtual, int cargaToneladas, boolean carregado) {
-        boolean pico = ParametrosSimulacao.isHorarioDePico(tempoAtual);
+        int hora = 7 + (tempoAtual / 60);
+        boolean pico = ParametrosSimulacao.isHorarioDePico(hora);
 
         int min = pico ? ParametrosSimulacao.TEMPO_MIN_PICO : ParametrosSimulacao.TEMPO_MIN_FORA_PICO;
         int max = pico ? ParametrosSimulacao.TEMPO_MAX_PICO : ParametrosSimulacao.TEMPO_MAX_FORA_PICO;
@@ -109,6 +110,18 @@ public class TempoUtil {
 
         // Tempo extra simula lentidão por peso ao estar carregado
         int tempoExtraCarregado = carregado ? (int) (tempoDeslocamento * 0.3) : 0;
+        int tempoTotal = tempoColeta + tempoDeslocamento + tempoExtraCarregado;
+
+//        System.out.println(ConsoleCor.ROXO +
+//                "\n📍 [TempoUtil] " +
+//                "Hora sim.: " + TempoUtil.formatarHorarioSimulado(tempoAtual) +
+//                " | HORA: " + hora + "h" +
+//                " | PICO? " + (pico ? "✅ SIM" : "❌ NÃO") +
+//                "\n  ↪ Coleta: " + tempoColeta + " min" +
+//                " | Desloc.: " + tempoDeslocamento + " min" +
+//                " | Extra carga: " + tempoExtraCarregado + " min" +
+//                " | TOTAL: " + tempoTotal + " min\n" +
+//                ConsoleCor.RESET);
 
         return new TempoDetalhado(tempoColeta, tempoDeslocamento, tempoExtraCarregado);
     }
