@@ -8,6 +8,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import simulador.configuracao.ParametrosSimulacao;
+import simulador.ui.TelaConfiguracao;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -20,13 +22,17 @@ public class MainFX extends Application {
     private Button pausarBtn;
     private Button encerrarBtn;
 
-    private Process simuladorProcess;
     private Thread simuladorThread;
     private volatile boolean pausado = false;
     private volatile boolean encerrado = false;
 
+
     @Override
     public void start(Stage primaryStage) {
+        iniciarTelaPrincipal(primaryStage);
+    }
+
+    private void iniciarTelaPrincipal(Stage primaryStage) {
         BorderPane root = new BorderPane();
         root.setPrefSize(1400, 800);
 
@@ -34,9 +40,29 @@ public class MainFX extends Application {
         Label titulo = new Label("Simulador de Coleta de Lixo - Teresina, PI");
         titulo.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
         BorderPane.setAlignment(titulo, Pos.CENTER);
-        root.setTop(titulo);
 
-        // Área de Log (parte inferior)
+        // Controles
+        HBox controles = new HBox(20);
+        controles.setPadding(new Insets(10));
+        controles.setAlignment(Pos.CENTER);
+
+        iniciarBtn = new Button("▶ Iniciar Simulação");
+        pausarBtn = new Button("⏸ Pausar");
+        encerrarBtn = new Button("⏹ Encerrar");
+        velocidadeSlider = new Slider(1, 5, 1);
+        velocidadeSlider.setMajorTickUnit(1);
+        velocidadeSlider.setSnapToTicks(true);
+        velocidadeSlider.setShowTickMarks(true);
+        velocidadeSlider.setShowTickLabels(true);
+        velocidadeSlider.setBlockIncrement(1);
+
+        controles.getChildren().addAll(iniciarBtn, pausarBtn, encerrarBtn, new Label("Velocidade:"), velocidadeSlider);
+
+        VBox topo = new VBox(10, titulo, controles);
+        topo.setAlignment(Pos.CENTER);
+        root.setTop(topo);
+
+        // Área de log
         logArea = new TextArea();
         logArea.setEditable(false);
         logArea.setWrapText(true);
@@ -44,13 +70,43 @@ public class MainFX extends Application {
         logArea.setPrefHeight(300);
         root.setBottom(logArea);
 
-        // Centro - mapa geográfico (zona fictícia de Teresina)
+// Sidebar de configuração (à esquerda)
+        VBox configuracaoBox = new VBox(10);
+        configuracaoBox.setPadding(new Insets(20));
+        configuracaoBox.setAlignment(Pos.TOP_LEFT);
+        configuracaoBox.setPrefWidth(250);
+
+        Label configTitulo = new Label("Parâmetros");
+        configTitulo.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+// Campos de texto para entrada manual
+        TextField diasField = new TextField("5");
+        TextField c2Field = new TextField("8");
+        TextField v2Field = new TextField("2");
+        TextField c4Field = new TextField("5");
+        TextField v4Field = new TextField("3");
+        TextField c8Field = new TextField("2");
+        TextField v8Field = new TextField("2");
+
+        configuracaoBox.getChildren().addAll(
+                configTitulo,
+                new Label("Dias de simulação:"), diasField,
+                new Label("Caminhões de 2t:"), c2Field,
+                new Label("Viagens por caminhão 2t:"), v2Field,
+                new Label("Caminhões de 4t:"), c4Field,
+                new Label("Viagens por caminhão 4t:"), v4Field,
+                new Label("Caminhões de 8t:"), c8Field,
+                new Label("Viagens por caminhão 8t:"), v8Field
+        );
+
+        root.setLeft(configuracaoBox);
+
+        // Mapa de zonas + estações
         GridPane mapa = new GridPane();
         mapa.setPadding(new Insets(20));
         mapa.setHgap(40);
         mapa.setVgap(30);
 
-        // Zonas de Teresina (visual fictício)
         String[][] zonas = {
                 {"Zona Norte", "#A5D6A7"},
                 {"Zona Sul", "#90CAF9"},
@@ -67,10 +123,10 @@ public class MainFX extends Application {
             label.setStyle("-fx-font-weight: bold;");
             Rectangle rect = new Rectangle(150, 100, Color.web(zona[1]));
             box.getChildren().addAll(label, rect);
-            mapa.add(box, row++ % 3, row / 3);
+            mapa.add(box, row % 3, row / 3);
+            row++;
         }
 
-        // Estações
         VBox estacoes = new VBox(20);
         estacoes.setPadding(new Insets(20));
         estacoes.setAlignment(Pos.CENTER_LEFT);
@@ -91,35 +147,34 @@ public class MainFX extends Application {
         centro.setAlignment(Pos.TOP_CENTER);
         root.setCenter(centro);
 
-        // Controles
-        HBox controles = new HBox(20);
-        controles.setPadding(new Insets(10));
-        controles.setAlignment(Pos.CENTER);
+        // Ações dos botões
+iniciarBtn.setOnAction(e -> {
+    try {
+        ParametrosSimulacao.Parametros parametrosSelecionados = new ParametrosSimulacao.Parametros(
+            Integer.parseInt(diasField.getText().trim()),
+            Integer.parseInt(c2Field.getText().trim()), Integer.parseInt(v2Field.getText().trim()),
+            Integer.parseInt(c4Field.getText().trim()), Integer.parseInt(v4Field.getText().trim()),
+            Integer.parseInt(c8Field.getText().trim()), Integer.parseInt(v8Field.getText().trim())
+        );
 
-        iniciarBtn = new Button("▶ Iniciar Simulação");
-        pausarBtn = new Button("⏸ Pausar");
-        encerrarBtn = new Button("⏹ Encerrar");
-        velocidadeSlider = new Slider(1, 5, 1);
-        velocidadeSlider.setMajorTickUnit(1);
-        velocidadeSlider.setSnapToTicks(true);
-        velocidadeSlider.setShowTickMarks(true);
-        velocidadeSlider.setShowTickLabels(true);
-        velocidadeSlider.setBlockIncrement(1);
+        ParametrosSimulacao.setParametrosExternos(parametrosSelecionados);
+        iniciarSimulacao();
 
-        controles.getChildren().addAll(iniciarBtn, pausarBtn, encerrarBtn, new Label("Velocidade:"), velocidadeSlider);
-        root.setTop(new VBox(titulo, controles));
+    } catch (NumberFormatException ex) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erro de Entrada");
+        alert.setHeaderText("Parâmetros inválidos");
+        alert.setContentText("Por favor, insira apenas números inteiros válidos nos campos.");
+        alert.showAndWait();
+    }
+});
 
-        iniciarBtn.setOnAction(e -> iniciarSimulacao());
         pausarBtn.setOnAction(e -> pausado = !pausado);
         encerrarBtn.setOnAction(e -> encerrarSimulacao());
 
         primaryStage.setScene(new Scene(root));
         primaryStage.setTitle("Simulador JavaFX");
         primaryStage.show();
-    }
-
-    private String removerCoresANSI(String texto) {
-        return texto.replaceAll("\u001B\\[[;\\d]*m", "");
     }
 
     private void iniciarSimulacao() {
@@ -134,7 +189,8 @@ public class MainFX extends Application {
                 PrintStream old = System.out;
                 System.setOut(ps);
 
-                Main.main(new String[0]);
+                Simulador sim = new Simulador();
+                sim.iniciarSimulacao();
 
                 ps.flush();
                 System.setOut(old);
@@ -174,6 +230,10 @@ public class MainFX extends Application {
             simuladorThread.interrupt();
         }
         logArea.appendText("\nSimulação encerrada.\n");
+    }
+
+    private String removerCoresANSI(String texto) {
+        return texto.replaceAll("\u001B\\[[;\\d]*m", "");
     }
 
     public static void main(String[] args) {
