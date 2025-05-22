@@ -57,6 +57,12 @@ public class AgendaEventos {
         }
     }
 
+    public static void resetar() {
+        eventos = new Lista<>();
+        tempoUltimoEvento = 0;
+        ultimoEventoExecutado = null;
+    }
+
     /**
      * Retorna o tempo em minutos do último evento processado.
      *

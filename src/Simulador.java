@@ -21,70 +21,65 @@ public class Simulador {
      * Inicia a simulação de coleta de lixo, realizando a configuração
      * inicial de zonas, estações, caminhões e eventos.
      */
-    public void iniciarSimulacao() {
+public void iniciarSimulacao(int dias) {
+    Lista<Zona> zonas = inicializarZonas();
+
+    // 1. Cria as estações (fixas)
+    EstacaoDeTransferencia estA = new EstacaoDeTransferencia("A");
+    EstacaoDeTransferencia estB = new EstacaoDeTransferencia("B");
+    MapeadorZonas.configurar(estA, estB);
+    MapeadorZonas.setZonas(zonas);
+
+    for (int dia = 1; dia <= dias; dia++) {
         System.out.println();
-        System.out.println(ConsoleCor.AMARELO + "=================== S I M U L A D O R ==================");
-        System.out.println();
-        // 1. Cria as 2 estações
-        System.out.println("Criando as 2 estações...");
-        EstacaoDeTransferencia estA = new EstacaoDeTransferencia("A");
-        EstacaoDeTransferencia estB = new EstacaoDeTransferencia("B");
+        System.out.println(ConsoleCor.AMARELO + "=================== DIA " + dia + " ====================");
+        System.out.println(ConsoleCor.RESET);
 
-        // 2. Diz ao mapeador quem atende cada conjunto de zonas
-        System.out.println("Mapeando quem atende cada conjunto de zonas");
-        MapeadorZonas.configurar(estA, estB);
-
-        // 3. Inicializa zonas e gera lixo diário
-//        System.out.println("==================== GERANDO ZONAS =====================");
-        System.out.println("Gerando lixo...");
-        Lista<Zona> zonas = inicializarZonas();
-
+        // 2. Gera lixo nas zonas
+        System.out.println("Gerando lixo nas zonas...");
         for (int i = 0; i < zonas.getTamanho(); i++) {
             zonas.getValor(i).gerarLixoDiario();
         }
 
-        // 4. Inicializa caminhões e agenda os eventos iniciais
+        // 3. Distribui caminhões
         Lista<CaminhaoPequeno> caminhoes2t = EventoDistribuidorDeRotas.distribuir(zonas, 8, 5, 2);
         Lista<CaminhaoPequeno> caminhoes4t = EventoDistribuidorDeRotas.distribuir(zonas, 5, 3, 4);
         Lista<CaminhaoPequeno> caminhoes8t = EventoDistribuidorDeRotas.distribuir(zonas, 2, 2, 8);
 
-        // Passando para o mapeador
-        MapeadorZonas.setZonas(zonas);
         MapeadorZonas.setCaminhoes(caminhoes2t);
         MapeadorZonas.setCaminhoes(caminhoes4t);
         MapeadorZonas.setCaminhoes(caminhoes8t);
 
+        System.out.println("Iniciando coleta...\n");
 
-        // 5. Inicia o processamento da simulação
-        System.out.println();
-        System.out.println("Iniciando simulação de coleta de lixo em Teresina\n");
-
+        // 4. Processa os eventos do dia
         AgendaEventos.processarEventos();
 
+        // 5. Exibe resumo do dia
         int tempoFinal = AgendaEventos.getTempoUltimoEvento();
-
         System.out.println();
-        System.out.println(ConsoleCor.RESET + "================== SIMULAÇÃO ENCERRADA ===================");
-        System.out.println("Simulação finalizada com sucesso!");
+        System.out.println(ConsoleCor.RESET + "=========== FIM DO DIA " + dia + " ===========");
         System.out.println("Tempo total: " + TempoUtil.formatarDuracao(tempoFinal) + " (encerra às " + TempoUtil.formatarHorarioSimulado(tempoFinal) + ")");
-        System.out.println("[LIXO FINAL POR ZONA]");
-
-        // Percorre todas as zonas e exibe o lixo restante em cada uma
+        System.out.println("[LIXO ACUMULADO POR ZONA]");
         for (int i = 0; i < zonas.getTamanho(); i++) {
             Zona zona = zonas.getValor(i);
             System.out.println("• " + zona.getNome() + ": " + zona.getLixoAcumulado() + "T");
         }
 
-        System.out.println("\n[RESUMO DOS CAMINHÕES UTILIZADOS]");
+        System.out.println("[RESUMO DOS CAMINHÕES]");
         System.out.printf("• Caminhões de 2t: %d%n", caminhoes2t.getTamanho());
         System.out.printf("• Caminhões de 4t: %d%n", caminhoes4t.getTamanho());
         System.out.printf("• Caminhões de 8t: %d%n", caminhoes8t.getTamanho());
-
-        System.out.println();
-        System.out.println("===========================================================");
-        System.out.println();
         System.out.println("Último evento processado: " + AgendaEventos.getUltimoEventoExecutado());
+
+        // Limpa eventos para o próximo dia
+        AgendaEventos.resetar();
     }
+
+    System.out.println();
+    System.out.println(ConsoleCor.AMARELO + "=============== SIMULAÇÃO ENCERRADA ===============");
+    System.out.println(ConsoleCor.RESET);
+}
 
     /**
      * Cria e retorna a lista de zonas da cidade utilizadas na simulação.
