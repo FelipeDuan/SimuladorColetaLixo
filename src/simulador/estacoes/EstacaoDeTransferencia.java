@@ -113,7 +113,7 @@ public class EstacaoDeTransferencia {
             caminhaoGrandeAtual.receberCarga(carga);
             caminhao.descarregar();
 
-            System.out.printf("  • Descarregou: %dt    Carga: %d/%d%n", carga, caminhao.getCargaAtual(), caminhao.getCapacidadeMaxima());
+            System.out.printf("  • Descarregou: %dt    Carga Atual: %d/%d%n", carga, caminhao.getCargaAtual(), caminhao.getCapacidadeMaxima());
             System.out.printf("  • Horário: %s     Tempo de Descarga: %s%n", TempoUtil.formatarHorarioSimulado(tempoDescarga + tempoAtual), TempoUtil.formatarDuracao(tempoDescarga));
             System.out.printf("  → Volta para atividadades %n", TempoUtil.formatarHorarioSimulado(tempoDescarga + tempoAtual));
 

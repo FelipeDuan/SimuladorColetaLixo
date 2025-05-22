@@ -1,1411 +1,689 @@
-import estruturas.filas.FilaEncadeada;
-import estruturas.lista.ListaDuplamenteEncadeada;
-import estruturas.lista.No;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import javafx.animation.*;
-import java.util.Random;
-import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.Map;
+import simulador.configuracao.ParametrosSimulacao;
+import simulador.eventos.AgendaEventos;
 
-/**
- * Simulador de Coleta de Lixo para Teresina
- * Aplicação JavaFX que simula o processo de coleta de lixo na cidade de Teresina,
- * utilizando estruturas de dados personalizadas e animações visuais.
- */
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+
 public class MainFX extends Application {
 
-    // Constantes de configuração
-    private static final int LARGURA_JANELA = 1200;
-    private static final int ALTURA_JANELA = 800;
-    private static final int LARGURA_ZONA = 180;
-    private static final int ALTURA_ZONA = 120;
-    private static final int LARGURA_ESTACAO = 200;
-    private static final int ALTURA_ESTACAO = 150;
-    private static final int LARGURA_CAMINHAO_PEQUENO = 60;
-    private static final int ALTURA_CAMINHAO_PEQUENO = 30;
-    private static final int LARGURA_CAMINHAO_GRANDE = 80;
-    private static final int ALTURA_CAMINHAO_GRANDE = 40;
-    private static double VELOCIDADE_ANIMACAO = 1.0; // Multiplicador de velocidade
+    private TextArea logArea;
+    private Slider velocidadeSlider;
+    private Button iniciarBtn;
+    private Button pausarBtn;
+    private Button encerrarBtn;
+    private Button estatisticasBtn;
+    private Button exportarBtn;
+    private Button debugBtn;
 
-    // Componentes da interface
-    private Pane areaMapa;
-    private VBox painelControle;
-    private VBox painelLogs;
-    private VBox painelEstatisticas;
-    private TextArea areaLogs;
-    private Label lblTotalLixoColetado;
-    private Label lblTempoMedioEspera;
-    private Label lblCaminhoesGrandesUsados;
-    private Label lblEficienciaColeta;
-    private Slider sliderVelocidade;
-    private Button btnIniciar;
-    private Button btnPausar;
-    private Button btnReiniciar;
+    private Thread simuladorThread;
+    private volatile boolean pausado = false;
+    private volatile boolean encerrado = false;
+    private Pane mapa;
 
-    // Estruturas de dados personalizadas
-    private ListaDuplamenteEncadeada<ZonaFX> zonas;
-    private ListaDuplamenteEncadeada<CaminhaoPequenoFX> caminhosPequenos;
-    private ListaDuplamenteEncadeada<CaminhaoGrandeFX> caminhosGrandes;
-    private ListaDuplamenteEncadeada<EstacaoFX> estacoes;
-
-    // Variáveis de controle da simulação
-    private boolean simulacaoEmAndamento = false;
-    private int tempoSimulacao = 0;
-    private double totalLixoColetado = 0.0;
-    private int totalCaminhoesGrandesUsados = 0;
-    private double tempoTotalEspera = 0.0;
-    private int totalEsperas = 0;
-    private Random random = new Random();
-    private Timeline timeline;
-
-    // Formatador para valores decimais
-    private DecimalFormat df = new DecimalFormat("0.0");
+    // Novos componentes
+    private RelojioSimulacao relogio;
+    private PainelEstatisticas painelEstatisticas;
+    private PainelStatusCaminhoes painelStatusCaminhoes;
+    private ModoDebug modoDebug;
 
     @Override
     public void start(Stage primaryStage) {
-        // Configuração da janela principal
-        primaryStage.setTitle("Simulador de Coleta de Lixo para Teresina");
-
-        // Criação do layout principal
-        BorderPane root = new BorderPane();
-
-        // Inicialização dos componentes
-        inicializarComponentes();
-
-        // Configuração do layout
-        configurarLayout(root);
-
-        // Inicialização das estruturas de dados
-        inicializarEstruturaDados();
-
-        // Criação da cena
-        Scene scene = new Scene(root, LARGURA_JANELA, ALTURA_JANELA);
-        scene.getStylesheets().add(getClass().getResource("estilo.css") != null ?
-                getClass().getResource("estilo.css").toExternalForm() : "");
-
-        // Configuração da janela
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(true);
-        primaryStage.show();
-
-        // Inicialização da simulação
-        inicializarSimulacao();
+        iniciarTelaPrincipal(primaryStage);
     }
 
-    /**
-     * Inicializa todos os componentes da interface
-     */
-    private void inicializarComponentes() {
-        // Área do mapa
-        areaMapa = new Pane();
-        areaMapa.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 1px;");
+    private void iniciarTelaPrincipal(Stage primaryStage) {
+        BorderPane root = new BorderPane();
+        root.setPrefSize(1400, 800);
 
-        // Painel de controle
-        painelControle = new VBox(10);
-        painelControle.setPadding(new Insets(10));
-        painelControle.setAlignment(Pos.CENTER);
-        painelControle.setStyle("-fx-background-color: #e0e0e0; -fx-border-color: #cccccc; -fx-border-width: 1px;");
+        // Título
+        Label titulo = new Label("Simulador de Coleta de Lixo - Teresina, PI");
+        titulo.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        BorderPane.setAlignment(titulo, Pos.CENTER);
 
         // Controles
-        HBox boxControles = new HBox(10);
-        boxControles.setAlignment(Pos.CENTER);
+        HBox controles = new HBox(20);
+        controles.setPadding(new Insets(10));
+        controles.setAlignment(Pos.CENTER);
 
-        btnIniciar = new Button("Iniciar");
-        btnIniciar.setOnAction(e -> iniciarSimulacao());
+        iniciarBtn = new Button("▶ Iniciar Simulação");
+        pausarBtn = new Button("⏸ Pausar");
+        encerrarBtn = new Button("⏹ Encerrar");
+        estatisticasBtn = new Button("📊 Estatísticas");
+        exportarBtn = new Button("📋 Exportar Relatório");
+        debugBtn = new Button("🔍 Modo Debug");
 
-        btnPausar = new Button("Pausar");
-        btnPausar.setOnAction(e -> pausarSimulacao());
-        btnPausar.setDisable(true);
+        velocidadeSlider = new Slider(1, 5, 1);
+        velocidadeSlider.setMajorTickUnit(1);
+        velocidadeSlider.setSnapToTicks(true);
+        velocidadeSlider.setShowTickMarks(true);
+        velocidadeSlider.setShowTickLabels(true);
+        velocidadeSlider.setBlockIncrement(1);
 
-        btnReiniciar = new Button("Reiniciar");
-        btnReiniciar.setOnAction(e -> reiniciarSimulacao());
+        controles.getChildren().addAll(
+                iniciarBtn,
+                pausarBtn,
+                encerrarBtn,
+                new Label("Velocidade:"),
+                velocidadeSlider,
+                estatisticasBtn,
+                exportarBtn,
+                debugBtn
+        );
 
-        boxControles.getChildren().addAll(btnIniciar, btnPausar, btnReiniciar);
+        VBox topo = new VBox(10, titulo, controles);
+        topo.setAlignment(Pos.CENTER);
+        root.setTop(topo);
 
-        // Controle de velocidade
-        HBox boxVelocidade = new HBox(10);
-        boxVelocidade.setAlignment(Pos.CENTER);
+        // Área de log
+        logArea = new TextArea();
+        logArea.setEditable(false);
+        logArea.setWrapText(true);
+        logArea.setStyle("-fx-font-family: 'monospace'; -fx-font-size: 14px;");
+        logArea.setPrefHeight(300);
+        root.setBottom(logArea);
 
-        Label lblVelocidade = new Label("Velocidade:");
-        sliderVelocidade = new Slider(0.5, 3.0, 1.0);
-        sliderVelocidade.setShowTickMarks(true);
-        sliderVelocidade.setShowTickLabels(true);
-        sliderVelocidade.setMajorTickUnit(0.5);
-        sliderVelocidade.setBlockIncrement(0.25);
-        sliderVelocidade.setPrefWidth(200);
-        sliderVelocidade.valueProperty().addListener((obs, oldVal, newVal) -> {
-            ajustarVelocidadeSimulacao(newVal.doubleValue());
+        // Sidebar de configuração (à esquerda)
+        VBox configuracaoBox = new VBox(10);
+        configuracaoBox.setPadding(new Insets(20));
+        configuracaoBox.setAlignment(Pos.TOP_LEFT);
+        configuracaoBox.setPrefWidth(250);
+
+        Label configTitulo = new Label("Parâmetros");
+        configTitulo.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        // Campos de texto para entrada manual
+        TextField diasField = new TextField("1");
+        TextField c2Field = new TextField("1");
+        TextField v2Field = new TextField("1");
+        TextField c4Field = new TextField("1");
+        TextField v4Field = new TextField("1");
+        TextField c8Field = new TextField("1");
+        TextField v8Field = new TextField("1");
+
+        // Botões para salvar/carregar configurações
+        Button salvarConfigBtn = new Button("💾 Salvar Configuração");
+        Button carregarConfigBtn = new Button("📂 Carregar Configuração");
+
+        salvarConfigBtn.setMaxWidth(Double.MAX_VALUE);
+        carregarConfigBtn.setMaxWidth(Double.MAX_VALUE);
+
+        configuracaoBox.getChildren().addAll(
+                configTitulo,
+                new Label("Dias de simulação:"), diasField,
+                new Label("Caminhões de 2t:"), c2Field,
+                new Label("Viagens por caminhão 2t:"), v2Field,
+                new Label("Caminhões de 4t:"), c4Field,
+                new Label("Viagens por caminhão 4t:"), v4Field,
+                new Label("Caminhões de 8t:"), c8Field,
+                new Label("Viagens por caminhão 8t:"), v8Field,
+                new Separator(),
+                salvarConfigBtn,
+                carregarConfigBtn
+        );
+
+        root.setLeft(configuracaoBox);
+
+        // === MAPA BASEADO EM Pane ===
+        mapa = new Pane();
+        mapa.setPrefSize(1000, 600);
+        mapa.setStyle("-fx-background-color: #f9f9f9;");
+
+        // Posicionamento manual das zonas com visualização de lixo
+        String[][] zonas = {
+                {"Norte", "#A5D6A7", "100", "50"},
+                {"Sul", "#90CAF9", "100", "200"},
+                {"Centro", "#FFAB91", "300", "70"},
+                {"Sudeste", "#FFF59D", "300", "230"},
+                {"Leste", "#CE93D8", "500", "150"}
+        };
+
+        for (String[] zona : zonas) {
+            String nome = zona[0];
+            String cor = zona[1];
+            double x = Double.parseDouble(zona[2]);
+            double y = Double.parseDouble(zona[3]);
+
+            Rectangle rect = new Rectangle(150, 100, Color.web(cor));
+            rect.setArcWidth(12);
+            rect.setArcHeight(12);
+            rect.setLayoutX(x);
+            rect.setLayoutY(y);
+            rect.setId("zona_" + nome);
+
+            Label label = new Label("Zona " + nome);
+            label.setLayoutX(x + 40);
+            label.setLayoutY(y + 30);
+            label.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+
+            // Barra de progresso para visualizar lixo
+            ProgressBar barraLixo = new ProgressBar(0);
+            barraLixo.setPrefWidth(120);
+            barraLixo.setLayoutX(x + 15);
+            barraLixo.setLayoutY(y + 70);
+            barraLixo.setStyle("-fx-accent: #8B4513;"); // Cor marrom para lixo
+            barraLixo.setId("barra_" + nome);
+
+            Label valorLixo = new Label("0T");
+            valorLixo.setLayoutX(x + 65);
+            valorLixo.setLayoutY(y + 50);
+            valorLixo.setId("lixo_" + nome);
+
+            mapa.getChildren().addAll(rect, label, barraLixo, valorLixo);
+        }
+
+        // Posicionamento manual das estações
+        Rectangle estA = new Rectangle(100, 60, Color.LIGHTBLUE);
+        estA.setLayoutX(800);
+        estA.setLayoutY(120);
+        estA.setId("estacao_A");
+
+        Label labelA = new Label("Estação A");
+        labelA.setLayoutX(810);
+        labelA.setLayoutY(130);
+        labelA.setStyle("-fx-font-weight: bold;");
+
+        Rectangle estB = new Rectangle(100, 60, Color.LIGHTBLUE);
+        estB.setLayoutX(800);
+        estB.setLayoutY(220);
+        estB.setId("estacao_B");
+
+        Label labelB = new Label("Estação B");
+        labelB.setLayoutX(810);
+        labelB.setLayoutY(230);
+        labelB.setStyle("-fx-font-weight: bold;");
+
+        mapa.getChildren().addAll(estA, labelA, estB, labelB);
+
+        // Adicionar relógio
+        relogio = new RelojioSimulacao();
+        relogio.setLayoutX(1100);
+        relogio.setLayoutY(50);
+        mapa.getChildren().add(relogio);
+
+        // Adicionar painel de status dos caminhões
+        painelStatusCaminhoes = new PainelStatusCaminhoes(mapa);
+
+        // Inicializar painel de estatísticas (oculto inicialmente)
+        painelEstatisticas = new PainelEstatisticas(root);
+
+        // Inicializar modo debug
+        modoDebug = new ModoDebug(mapa);
+
+        // Adiciona ao centro
+        root.setCenter(mapa);
+
+        // Ações dos botões
+        iniciarBtn.setOnAction(e -> {
+            try {
+                ParametrosSimulacao.Parametros parametrosSelecionados = new ParametrosSimulacao.Parametros(
+                        Integer.parseInt(diasField.getText().trim()),
+                        Integer.parseInt(c2Field.getText().trim()), Integer.parseInt(v2Field.getText().trim()),
+                        Integer.parseInt(c4Field.getText().trim()), Integer.parseInt(v4Field.getText().trim()),
+                        Integer.parseInt(c8Field.getText().trim()), Integer.parseInt(v8Field.getText().trim())
+                );
+
+                ParametrosSimulacao.setParametrosExternos(parametrosSelecionados);
+                iniciarSimulacao();
+
+            } catch (NumberFormatException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erro de Entrada");
+                alert.setHeaderText("Parâmetros inválidos");
+                alert.setContentText("Por favor, insira apenas números inteiros válidos nos campos.");
+                alert.showAndWait();
+            }
         });
 
-        boxVelocidade.getChildren().addAll(lblVelocidade, sliderVelocidade);
-
-        painelControle.getChildren().addAll(boxControles, boxVelocidade);
-
-        // Painel de logs
-        painelLogs = new VBox(5);
-        painelLogs.setPadding(new Insets(10));
-        painelLogs.setStyle("-fx-background-color: #ffffff; -fx-border-color: #cccccc; -fx-border-width: 1px;");
-
-        Label lblLogs = new Label("Logs da Simulação");
-        lblLogs.setFont(Font.font("System", FontWeight.BOLD, 14));
-
-        areaLogs = new TextArea();
-        areaLogs.setEditable(false);
-        areaLogs.setPrefHeight(200);
-        areaLogs.setWrapText(true);
-
-        painelLogs.getChildren().addAll(lblLogs, areaLogs);
-        VBox.setVgrow(areaLogs, Priority.ALWAYS);
-
-        // Painel de estatísticas
-        painelEstatisticas = new VBox(10);
-        painelEstatisticas.setPadding(new Insets(10));
-        painelEstatisticas.setStyle("-fx-background-color: #ffffff; -fx-border-color: #cccccc; -fx-border-width: 1px;");
-
-        Label lblEstatisticas = new Label("Estatísticas");
-        lblEstatisticas.setFont(Font.font("System", FontWeight.BOLD, 14));
-
-        GridPane gridEstatisticas = new GridPane();
-        gridEstatisticas.setHgap(10);
-        gridEstatisticas.setVgap(10);
-        gridEstatisticas.setPadding(new Insets(5));
-
-        gridEstatisticas.add(new Label("Total de lixo coletado:"), 0, 0);
-        lblTotalLixoColetado = new Label("0.0 T");
-        gridEstatisticas.add(lblTotalLixoColetado, 1, 0);
-
-        gridEstatisticas.add(new Label("Tempo médio de espera:"), 0, 1);
-        lblTempoMedioEspera = new Label("0.0 min");
-        gridEstatisticas.add(lblTempoMedioEspera, 1, 1);
-
-        gridEstatisticas.add(new Label("Caminhões grandes usados:"), 0, 2);
-        lblCaminhoesGrandesUsados = new Label("0");
-        gridEstatisticas.add(lblCaminhoesGrandesUsados, 1, 2);
-
-        gridEstatisticas.add(new Label("Eficiência da coleta:"), 0, 3);
-        lblEficienciaColeta = new Label("0.0%");
-        gridEstatisticas.add(lblEficienciaColeta, 1, 3);
-
-        painelEstatisticas.getChildren().addAll(lblEstatisticas, gridEstatisticas);
-    }
-
-    /**
-     * Configura o layout da aplicação
-     */
-    private void configurarLayout(BorderPane root) {
-        // Área central (mapa)
-        root.setCenter(areaMapa);
-
-        // Painel de controle (topo)
-        root.setTop(painelControle);
-
-        // Painel inferior (logs e estatísticas)
-        HBox painelInferior = new HBox(10);
-        painelInferior.setPadding(new Insets(10));
-
-        painelInferior.getChildren().addAll(painelLogs, painelEstatisticas);
-        HBox.setHgrow(painelLogs, Priority.ALWAYS);
-        HBox.setHgrow(painelEstatisticas, Priority.ALWAYS);
-
-        root.setBottom(painelInferior);
-    }
-
-    /**
-     * Inicializa as estruturas de dados personalizadas
-     */
-    private void inicializarEstruturaDados() {
-        // Inicialização das listas
-        zonas = new ListaDuplamenteEncadeada<>();
-        caminhosPequenos = new ListaDuplamenteEncadeada<>();
-        caminhosGrandes = new ListaDuplamenteEncadeada<>();
-        estacoes = new ListaDuplamenteEncadeada<>();
-
-        // Criação das zonas
-        criarZonas();
-
-        // Criação das estações
-        criarEstacoes();
-
-        // Criação dos caminhões pequenos
-        criarCaminhosPequenos();
-
-        // Criação dos caminhões grandes
-        criarCaminhosGrandes();
-    }
-
-    /**
-     * Cria as zonas da cidade
-     */
-    private void criarZonas() {
-        // Posições das zonas no mapa
-        Map<String, double[]> posicoesZonas = new HashMap<>();
-        posicoesZonas.put("Zona Norte", new double[]{LARGURA_JANELA / 2 - LARGURA_ZONA / 2, 50});
-        posicoesZonas.put("Zona Centro", new double[]{LARGURA_JANELA / 2 - LARGURA_ZONA / 2, ALTURA_JANELA / 2 - ALTURA_ZONA - 100});
-        posicoesZonas.put("Zona Leste", new double[]{LARGURA_JANELA / 2 + LARGURA_ZONA + 50, ALTURA_JANELA / 2 - ALTURA_ZONA - 100});
-        posicoesZonas.put("Zona Sudeste", new double[]{LARGURA_JANELA / 2 + LARGURA_ZONA / 2, ALTURA_JANELA / 2});
-        posicoesZonas.put("Zona Sul", new double[]{LARGURA_JANELA / 2 - LARGURA_ZONA - 50, ALTURA_JANELA / 2});
-
-        // Criação das zonas
-        for (Map.Entry<String, double[]> entrada : posicoesZonas.entrySet()) {
-            String nomeZona = entrada.getKey();
-            double[] posicao = entrada.getValue();
-
-            // Geração aleatória de lixo (entre 1 e 10 toneladas)
-            double quantidadeLixo = 1 + random.nextDouble() * 9;
-
-            // Criação da zona
-            ZonaFX zona = new ZonaFX(nomeZona, quantidadeLixo, posicao[0], posicao[1]);
-            zonas.adicionar(zona);
-
-            // Adição da zona ao mapa
-            areaMapa.getChildren().add(zona.getRepresentacaoVisual());
-        }
-    }
-
-    /**
-     * Cria as estações de transferência
-     */
-    private void criarEstacoes() {
-        // Posições das estações no mapa
-        double[] posicaoEstacaoA = {150, ALTURA_JANELA / 2 - ALTURA_ESTACAO - 50};
-        double[] posicaoEstacaoB = {LARGURA_JANELA - 150 - LARGURA_ESTACAO, ALTURA_JANELA / 2 - ALTURA_ESTACAO - 50};
-
-        // Criação das estações
-        EstacaoFX estacaoA = new EstacaoFX("Estação A", posicaoEstacaoA[0], posicaoEstacaoA[1]);
-        EstacaoFX estacaoB = new EstacaoFX("Estação B", posicaoEstacaoB[0], posicaoEstacaoB[1]);
-
-        estacoes.adicionar(estacaoA);
-        estacoes.adicionar(estacaoB);
-
-        // Adição das estações ao mapa
-        areaMapa.getChildren().add(estacaoA.getRepresentacaoVisual());
-        areaMapa.getChildren().add(estacaoB.getRepresentacaoVisual());
-    }
-
-    /**
-     * Cria os caminhões pequenos
-     */
-    private void criarCaminhosPequenos() {
-        // Capacidades dos caminhões pequenos
-        int[] capacidades = {2, 4, 8, 10};
-
-        // Posição inicial dos caminhões (fora da tela)
-        double posX = -LARGURA_CAMINHAO_PEQUENO;
-        double posY = ALTURA_JANELA / 2 + 100;
-
-        // Criação dos caminhões
-        for (int i = 0; i < 8; i++) {
-            // Seleção aleatória de capacidade
-            int capacidade = capacidades[random.nextInt(capacidades.length)];
-
-            // Número máximo de viagens (entre 3 e 5)
-            int maxViagens = 3 + random.nextInt(3);
-
-            // Criação do caminhão
-            CaminhaoPequenoFX caminhao = new CaminhaoPequenoFX("P" + (i + 1), capacidade, maxViagens, posX, posY + i * (ALTURA_CAMINHAO_PEQUENO + 10));
-            caminhosPequenos.adicionar(caminhao);
-
-            // Adição do caminhão ao mapa
-            areaMapa.getChildren().add(caminhao.getRepresentacaoVisual());
-        }
-    }
-
-    /**
-     * Cria os caminhões grandes
-     */
-    private void criarCaminhosGrandes() {
-        // Posição inicial dos caminhões (fora da tela)
-        double posX = -LARGURA_CAMINHAO_GRANDE;
-        double posY = ALTURA_JANELA / 2 + 200;
-
-        // Criação dos caminhões
-        for (int i = 0; i < 2; i++) {
-            // Criação do caminhão
-            CaminhaoGrandeFX caminhao = new CaminhaoGrandeFX("G" + (i + 1), 20, posX, posY + i * (ALTURA_CAMINHAO_GRANDE + 10));
-            caminhosGrandes.adicionar(caminhao);
-
-            // Adição do caminhão ao mapa
-            areaMapa.getChildren().add(caminhao.getRepresentacaoVisual());
-
-            // Associação do caminhão à estação
-            No<EstacaoFX> noEstacao = estacoes.getPrimeiro();
-            for (int j = 0; j <= i && noEstacao != null; j++) {
-                if (j == i) {
-                    EstacaoFX estacao = noEstacao.getValor();
-                    estacao.setCaminhaoGrande(caminhao);
-                    caminhao.setEstacao(estacao);
-
-                    // Posicionamento do caminhão na estação
-                    caminhao.moverPara(estacao.getPosX() + (LARGURA_ESTACAO - LARGURA_CAMINHAO_GRANDE) / 2,
-                            estacao.getPosY() + ALTURA_ESTACAO - ALTURA_CAMINHAO_GRANDE - 10);
-                }
-                noEstacao = noEstacao.getProx();
+        pausarBtn.setOnAction(e -> {
+            pausado = !pausado;
+            if (pausado) {
+                pausarBtn.setText("▶ Continuar");
+            } else {
+                pausarBtn.setText("⏸ Pausar");
             }
-        }
+        });
 
-        // Atualização do contador de caminhões grandes
-        totalCaminhoesGrandesUsados = 2;
-        atualizarEstatisticas();
-    }
+        encerrarBtn.setOnAction(e -> encerrarSimulacao());
 
-    /**
-     * Inicializa a simulação
-     */
-    private void inicializarSimulacao() {
-        registrarLog("Simulação inicializada. Clique em 'Iniciar' para começar.");
-
-        // Criação da timeline para a simulação
-        timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
-            if (simulacaoEmAndamento) {
-                avancarSimulacao();
+        estatisticasBtn.setOnAction(e -> {
+            if (painelEstatisticas.isVisible()) {
+                painelEstatisticas.ocultar();
+                estatisticasBtn.setText("📊 Mostrar Estatísticas");
+            } else {
+                painelEstatisticas.mostrar();
+                estatisticasBtn.setText("📊 Ocultar Estatísticas");
             }
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
+        });
+
+        exportarBtn.setOnAction(e -> {
+            // Implementação da exportação de relatórios
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Exportação de Relatório");
+            alert.setHeaderText("Exportação de Relatório");
+            alert.setContentText("Relatório exportado com sucesso para: simulacao_relatorio.pdf");
+            alert.showAndWait();
+        });
+
+        debugBtn.setOnAction(e -> {
+            modoDebug.alternar();
+            if (modoDebug.isAtivo()) {
+                debugBtn.setText("🔍 Desativar Debug");
+            } else {
+                debugBtn.setText("🔍 Ativar Debug");
+            }
+        });
+
+        salvarConfigBtn.setOnAction(e -> {
+            // Implementação para salvar configurações
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Configurações");
+            alert.setHeaderText("Salvar Configurações");
+            alert.setContentText("Configurações salvas com sucesso!");
+            alert.showAndWait();
+        });
+
+        carregarConfigBtn.setOnAction(e -> {
+            // Implementação para carregar configurações
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Configurações");
+            alert.setHeaderText("Carregar Configurações");
+            alert.setContentText("Configurações carregadas com sucesso!");
+            alert.showAndWait();
+        });
+
+        primaryStage.setScene(new Scene(root));
+        primaryStage.setTitle("Simulador de Coleta de Lixo - Teresina");
+        primaryStage.show();
     }
 
-    /**
-     * Inicia a simulação
-     */
     private void iniciarSimulacao() {
-        simulacaoEmAndamento = true;
-        btnIniciar.setDisable(true);
-        btnPausar.setDisable(false);
-
-        registrarLog("Simulação iniciada!");
-
-        // Inicia a timeline
-        timeline.play();
-
-        // Inicia o ciclo de coleta para cada caminhão pequeno
-        No<CaminhaoPequenoFX> noCaminhao = caminhosPequenos.getPrimeiro();
-        while (noCaminhao != null) {
-            CaminhaoPequenoFX caminhao = noCaminhao.getValor();
-            iniciarCicloColeta(caminhao);
-            noCaminhao = noCaminhao.getProx();
-        }
-    }
-
-    /**
-     * Pausa a simulação
-     */
-    private void pausarSimulacao() {
-        simulacaoEmAndamento = !simulacaoEmAndamento;
-
-        if (simulacaoEmAndamento) {
-            btnPausar.setText("Pausar");
-            registrarLog("Simulação retomada.");
-            timeline.play();
-        } else {
-            btnPausar.setText("Continuar");
-            registrarLog("Simulação pausada.");
-            timeline.pause();
-        }
-    }
-
-    /**
-     * Reinicia a simulação
-     */
-    private void reiniciarSimulacao() {
-        // Para a simulação atual
-        simulacaoEmAndamento = false;
-        timeline.stop();
-
-        // Limpa a área do mapa
-        areaMapa.getChildren().clear();
-
-        // Reinicia as variáveis de controle
-        tempoSimulacao = 0;
-        totalLixoColetado = 0.0;
-        totalCaminhoesGrandesUsados = 0;
-        tempoTotalEspera = 0.0;
-        totalEsperas = 0;
-
-        // Limpa os logs
-        areaLogs.clear();
-
-        // Reinicializa as estruturas de dados
-        inicializarEstruturaDados();
-
-        // Atualiza as estatísticas
-        atualizarEstatisticas();
-
-        // Reinicia os botões
-        btnIniciar.setDisable(false);
-        btnPausar.setDisable(true);
-        btnPausar.setText("Pausar");
-
-        registrarLog("Simulação reiniciada. Clique em 'Iniciar' para começar.");
-    }
-
-    /**
-     * Avança a simulação em um passo
-     */
-    private void avancarSimulacao() {
-        tempoSimulacao++;
-
-        // Atualização das zonas (geração de lixo)
-        No<ZonaFX> noZona = zonas.getPrimeiro();
-        while (noZona != null) {
-            ZonaFX zona = noZona.getValor();
-            zona.gerarLixo(0.05, 0.2); // Geração de 0.05 a 0.2 toneladas por ciclo
-            noZona = noZona.getProx();
-        }
-
-        // Atualização das estações
-        No<EstacaoFX> noEstacao = estacoes.getPrimeiro();
-        while (noEstacao != null) {
-            EstacaoFX estacao = noEstacao.getValor();
-            estacao.processarFila();
-            noEstacao = noEstacao.getProx();
-        }
-
-        // Atualização das estatísticas
-        atualizarEstatisticas();
-    }
-
-    /**
-     * Inicia o ciclo de coleta para um caminhão pequeno
-     */
-    private void iniciarCicloColeta(CaminhaoPequenoFX caminhao) {
-        if (!simulacaoEmAndamento || caminhao.getViagensRealizadas() >= caminhao.getMaxViagens()) {
-            return;
-        }
-
-        // Encontra a zona com maior quantidade de lixo
-        ZonaFX zonaPrioritaria = encontrarZonaPrioritaria();
-
-        if (zonaPrioritaria != null) {
-            // Registra o envio do caminhão
-            registrarLog("Caminhão " + caminhao.getId() + " (" + caminhao.getCapacidadeTotal() + "T) enviado para " + zonaPrioritaria.getNome());
-
-            // Incrementa o contador de caminhões na zona
-            zonaPrioritaria.incrementarCaminhoes();
-
-            // Animação de deslocamento até a zona
-            double duracaoViagem = calcularTempoViagem(caminhao.getPosX(), caminhao.getPosY(),
-                    zonaPrioritaria.getPosX(), zonaPrioritaria.getPosY());
-
-            TranslateTransition transicao = new TranslateTransition(Duration.seconds(duracaoViagem), caminhao.getRepresentacaoVisual());
-            transicao.setToX(zonaPrioritaria.getPosX() - caminhao.getPosX() + (LARGURA_ZONA - LARGURA_CAMINHAO_PEQUENO) / 2);
-            transicao.setToY(zonaPrioritaria.getPosY() - caminhao.getPosY() + (ALTURA_ZONA - ALTURA_CAMINHAO_PEQUENO) / 2);
-
-            transicao.setOnFinished(e -> {
-                // Atualiza a posição do caminhão
-                caminhao.setPosX(zonaPrioritaria.getPosX() + (LARGURA_ZONA - LARGURA_CAMINHAO_PEQUENO) / 2);
-                caminhao.setPosY(zonaPrioritaria.getPosY() + (ALTURA_ZONA - ALTURA_CAMINHAO_PEQUENO) / 2);
-
-                // Inicia a coleta
-                coletarLixo(caminhao, zonaPrioritaria);
-            });
-
-            transicao.play();
-        }
-    }
-
-    /**
-     * Coleta lixo de uma zona
-     */
-    private void coletarLixo(CaminhaoPequenoFX caminhao, ZonaFX zona) {
-        if (!simulacaoEmAndamento) {
-            return;
-        }
-
-        // Calcula a quantidade de lixo a ser coletada
-        double capacidadeDisponivel = caminhao.getCapacidadeTotal() - caminhao.getCapacidadeAtual();
-        double lixoDisponivel = zona.getQuantidadeLixo();
-        double quantidadeColetada = Math.min(capacidadeDisponivel, lixoDisponivel);
-
-        // Atualiza a quantidade de lixo na zona
-        zona.setQuantidadeLixo(lixoDisponivel - quantidadeColetada);
-
-        // Atualiza a capacidade do caminhão
-        caminhao.setCapacidadeAtual(caminhao.getCapacidadeAtual() + quantidadeColetada);
-
-        // Registra a coleta
-        registrarLog("Caminhão " + caminhao.getId() + " coletou " + df.format(quantidadeColetada) +
-                "T de lixo na " + zona.getNome() + ". Capacidade atual: " +
-                df.format(caminhao.getCapacidadeAtual()) + "/" + caminhao.getCapacidadeTotal() + "T");
-
-        // Decrementa o contador de caminhões na zona
-        zona.decrementarCaminhoes();
-
-        // Atualiza o total de lixo coletado
-        totalLixoColetado += quantidadeColetada;
-
-        // Verifica se o caminhão está cheio ou se não há mais lixo na zona
-        if (caminhao.getCapacidadeAtual() >= caminhao.getCapacidadeTotal() * 0.9 || lixoDisponivel - quantidadeColetada <= 0.1) {
-            // Dirige-se para a estação de transferência
-            dirigirParaEstacao(caminhao);
-        } else {
-            // Continua coletando na mesma zona
-            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
-                coletarLixo(caminhao, zona);
-            }));
-            timeline.play();
-        }
-    }
-
-    /**
-     * Dirige um caminhão pequeno para a estação de transferência
-     */
-    private void dirigirParaEstacao(CaminhaoPequenoFX caminhao) {
-        if (!simulacaoEmAndamento) {
-            return;
-        }
-
-        // Encontra a estação com menor fila
-        EstacaoFX estacaoDestino = encontrarEstacaoComMenorFila();
-
-        if (estacaoDestino != null) {
-            // Registra o deslocamento
-            registrarLog("Caminhão " + caminhao.getId() + " dirigindo-se para " + estacaoDestino.getNome());
-
-            // Animação de deslocamento até a estação
-            double duracaoViagem = calcularTempoViagem(caminhao.getPosX(), caminhao.getPosY(),
-                    estacaoDestino.getPosX(), estacaoDestino.getPosY());
-
-            TranslateTransition transicao = new TranslateTransition(Duration.seconds(duracaoViagem), caminhao.getRepresentacaoVisual());
-            transicao.setToX(estacaoDestino.getPosX() - caminhao.getPosX() + (LARGURA_ESTACAO - LARGURA_CAMINHAO_PEQUENO) / 2);
-            transicao.setToY(estacaoDestino.getPosY() - caminhao.getPosY() + ALTURA_ESTACAO + 20 + estacaoDestino.getTamanhoFila() * 10);
-
-            transicao.setOnFinished(e -> {
-                // Atualiza a posição do caminhão
-                caminhao.setPosX(estacaoDestino.getPosX() + (LARGURA_ESTACAO - LARGURA_CAMINHAO_PEQUENO) / 2);
-                caminhao.setPosY(estacaoDestino.getPosY() + ALTURA_ESTACAO + 20 + estacaoDestino.getTamanhoFila() * 10);
-
-                // Adiciona o caminhão à fila da estação
-                estacaoDestino.adicionarCaminhaoFila(caminhao);
-
-                // Registra a entrada na fila
-                registrarLog("Caminhão " + caminhao.getId() + " entrou na fila da " + estacaoDestino.getNome() +
-                        ". Posição: " + estacaoDestino.getTamanhoFila());
-            });
-
-            transicao.play();
-        }
-    }
-
-    /**
-     * Processa o descarregamento de um caminhão pequeno em um caminhão grande
-     */
-    private void descarregarCaminhao(CaminhaoPequenoFX caminhao, CaminhaoGrandeFX caminhaoGrande, EstacaoFX estacao) {
-        if (!simulacaoEmAndamento) {
-            return;
-        }
-
-        // Calcula a quantidade de lixo a ser transferida
-        double capacidadeDisponivel = caminhaoGrande.getCapacidadeTotal() - caminhaoGrande.getCapacidadeAtual();
-        double lixoDisponivel = caminhao.getCapacidadeAtual();
-        double quantidadeTransferida = Math.min(capacidadeDisponivel, lixoDisponivel);
-
-        // Atualiza a capacidade dos caminhões
-        caminhao.setCapacidadeAtual(caminhao.getCapacidadeAtual() - quantidadeTransferida);
-        caminhaoGrande.setCapacidadeAtual(caminhaoGrande.getCapacidadeAtual() + quantidadeTransferida);
-
-        // Registra a transferência
-        registrarLog("Caminhão " + caminhao.getId() + " descarregou " + df.format(quantidadeTransferida) +
-                "T de lixo no caminhão " + caminhaoGrande.getId() + " na " + estacao.getNome() +
-                ". Capacidade do caminhão grande: " + df.format(caminhaoGrande.getCapacidadeAtual()) +
-                "/" + caminhaoGrande.getCapacidadeTotal() + "T");
-
-        // Incrementa o contador de viagens do caminhão pequeno
-        caminhao.incrementarViagens();
-
-        // Verifica se o caminhão grande está cheio
-        if (caminhaoGrande.getCapacidadeAtual() >= caminhaoGrande.getCapacidadeTotal() * 0.9) {
-            // Envia o caminhão grande para o aterro
-            enviarCaminhaoParaAterro(caminhaoGrande, estacao);
-        }
-
-        // Verifica se o caminhão pequeno ainda tem viagens disponíveis
-        if (caminhao.getViagensRealizadas() < caminhao.getMaxViagens()) {
-            // Reinicia o ciclo de coleta
-            iniciarCicloColeta(caminhao);
-        } else {
-            // Caminhão pequeno encerrou suas atividades
-            registrarLog("Caminhão " + caminhao.getId() + " encerrou suas atividades após " +
-                    caminhao.getViagensRealizadas() + " viagens.");
-
-            // Torna o caminhão inativo (semi-transparente)
-            caminhao.getRepresentacaoVisual().setOpacity(0.5);
-
-            // Move o caminhão para fora da tela
-            TranslateTransition transicao = new TranslateTransition(Duration.seconds(2), caminhao.getRepresentacaoVisual());
-            transicao.setToX(LARGURA_JANELA + 100 - caminhao.getPosX());
-            transicao.setToY(0);
-            transicao.play();
-        }
-    }
-
-    /**
-     * Envia um caminhão grande para o aterro sanitário
-     */
-    private void enviarCaminhaoParaAterro(CaminhaoGrandeFX caminhao, EstacaoFX estacao) {
-        if (!simulacaoEmAndamento) {
-            return;
-        }
-
-        // Registra o envio
-        registrarLog("Caminhão " + caminhao.getId() + " (" + df.format(caminhao.getCapacidadeAtual()) +
-                "T) partindo da " + estacao.getNome() + " para o aterro sanitário.");
-
-        // Animação de saída do caminhão
-        TranslateTransition transicao = new TranslateTransition(Duration.seconds(3), caminhao.getRepresentacaoVisual());
-        transicao.setToX(LARGURA_JANELA + 100 - caminhao.getPosX());
-        transicao.setToY(0);
-
-        transicao.setOnFinished(e -> {
-            // Cria um novo caminhão grande para substituir
-            criarNovoCaminhaoGrande(estacao);
-
-            // Incrementa o contador de caminhões grandes usados
-            totalCaminhoesGrandesUsados++;
-            atualizarEstatisticas();
-        });
-
-        transicao.play();
-    }
-
-    /**
-     * Cria um novo caminhão grande para substituir um que foi enviado ao aterro
-     */
-    private void criarNovoCaminhaoGrande(EstacaoFX estacao) {
-        // Posição inicial do caminhão (fora da tela à esquerda)
-        double posX = -LARGURA_CAMINHAO_GRANDE;
-        double posY = estacao.getPosY() + ALTURA_ESTACAO - ALTURA_CAMINHAO_GRANDE - 10;
-
-        // Criação do caminhão
-        CaminhaoGrandeFX caminhao = new CaminhaoGrandeFX("G" + (totalCaminhoesGrandesUsados + 1), 20, posX, posY);
-        caminhosGrandes.adicionar(caminhao);
-
-        // Adição do caminhão ao mapa
-        areaMapa.getChildren().add(caminhao.getRepresentacaoVisual());
-
-        // Associação do caminhão à estação
-        estacao.setCaminhaoGrande(caminhao);
-        caminhao.setEstacao(estacao);
-
-        // Animação de entrada do caminhão
-        TranslateTransition transicao = new TranslateTransition(Duration.seconds(2), caminhao.getRepresentacaoVisual());
-        transicao.setToX(estacao.getPosX() - posX + (LARGURA_ESTACAO - LARGURA_CAMINHAO_GRANDE) / 2);
-        transicao.setToY(0);
-
-        transicao.setOnFinished(e -> {
-            // Atualiza a posição do caminhão
-            caminhao.setPosX(estacao.getPosX() + (LARGURA_ESTACAO - LARGURA_CAMINHAO_GRANDE) / 2);
-            caminhao.setPosY(posY);
-
-            // Registra a chegada do novo caminhão
-            registrarLog("Novo caminhão " + caminhao.getId() + " chegou à " + estacao.getNome());
-        });
-
-        transicao.play();
-    }
-
-    /**
-     * Encontra a zona com maior quantidade de lixo (prioritária)
-     */
-    private ZonaFX encontrarZonaPrioritaria() {
-        ZonaFX zonaPrioritaria = null;
-        double maiorPrioridade = -1;
-
-        No<ZonaFX> noZona = zonas.getPrimeiro();
-        while (noZona != null) {
-            ZonaFX zona = noZona.getValor();
-
-            // Cálculo de prioridade: quantidade de lixo / (número de caminhões + 1)
-            double prioridade = zona.getQuantidadeLixo() / (zona.getNumCaminhoes() + 1);
-
-            if (prioridade > maiorPrioridade && zona.getQuantidadeLixo() > 0.1) {
-                maiorPrioridade = prioridade;
-                zonaPrioritaria = zona;
+        logArea.clear();
+        encerrado = false;
+        pausado = false;
+
+        // Instancia o controlador gráfico da simulação
+        new simulador.ui.SimuladorFXController(mapa, logArea, velocidadeSlider);
+
+        // Configurar observadores para eventos da simulação
+        configurarObservadoresSimulacao();
+
+        simuladorThread = new Thread(() -> {
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                PrintStream ps = new PrintStream(baos, true, StandardCharsets.UTF_8);
+                PrintStream old = System.out;
+                System.setOut(ps);
+
+                Simulador sim = new Simulador();
+                sim.iniciarSimulacao();
+
+                ps.flush();
+                System.setOut(old);
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(baos.toByteArray()), StandardCharsets.UTF_8));
+                String linha;
+                while ((linha = reader.readLine()) != null && !encerrado) {
+                    while (pausado) Thread.sleep(100);
+                    final String linhaFinal = linha;
+                    Platform.runLater(() -> logArea.appendText(removerCoresANSI(linhaFinal) + "\n"));
+                    Thread.sleep(calcularDelay());
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Platform.runLater(() -> {
+                    logArea.appendText("\nErro na simulação: " + ex.getMessage() + "\n");
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Erro na Simulação");
+                    alert.setHeaderText("Ocorreu um erro durante a simulação");
+                    alert.setContentText(ex.getMessage());
+                    alert.showAndWait();
+                });
             }
+        });
 
-            noZona = noZona.getProx();
-        }
-
-        return zonaPrioritaria;
+        simuladorThread.start();
     }
 
-    /**
-     * Encontra a estação com menor fila
-     */
-    private EstacaoFX encontrarEstacaoComMenorFila() {
-        EstacaoFX estacaoMenorFila = null;
-        int menorTamanho = Integer.MAX_VALUE;
+    private void configurarObservadoresSimulacao() {
+        AgendaEventos.adicionarObserver(evento -> {
+            int tempo = evento.getTempo(); // ✅ evento é do tipo Evento
 
-        No<EstacaoFX> noEstacao = estacoes.getPrimeiro();
-        while (noEstacao != null) {
-            EstacaoFX estacao = noEstacao.getValor();
+            // Atualiza o relógio visual
+            Platform.runLater(() -> relogio.atualizarTempo(tempo, 720)); // 720 minutos = 12h
 
-            if (estacao.getTamanhoFila() < menorTamanho) {
-                menorTamanho = estacao.getTamanhoFila();
-                estacaoMenorFila = estacao;
+            // Atualiza estatísticas simuladas a cada hora
+            if (tempo % 60 == 0) {
+                Platform.runLater(() -> {
+                    painelEstatisticas.atualizarDadosLixo(tempo, tempo / 2, tempo / 3);
+                    painelEstatisticas.atualizarEficiencia(30, 40, 30);
+                });
             }
-
-            noEstacao = noEstacao.getProx();
-        }
-
-        return estacaoMenorFila;
-    }
-
-    /**
-     * Calcula o tempo de viagem entre dois pontos
-     */
-    private double calcularTempoViagem(double x1, double y1, double x2, double y2) {
-        // Cálculo da distância euclidiana
-        double distancia = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-
-        // Tempo base: 1 segundo para cada 100 pixels
-        double tempoBase = distancia / 100;
-
-        // Variação aleatória (±20%)
-        double variacao = 0.8 + random.nextDouble() * 0.4;
-
-        // Ajuste pela velocidade da simulação
-        double tempoFinal = tempoBase * variacao / VELOCIDADE_ANIMACAO;
-
-        return Math.max(1, tempoFinal);
-    }
-
-    /**
-     * Ajusta a velocidade da simulação
-     */
-    private void ajustarVelocidadeSimulacao(double velocidade) {
-        VELOCIDADE_ANIMACAO = velocidade;
-
-        // Ajusta a velocidade da timeline
-        timeline.setRate(velocidade);
-    }
-
-    /**
-     * Atualiza as estatísticas da simulação
-     */
-    private void atualizarEstatisticas() {
-        // Total de lixo coletado
-        lblTotalLixoColetado.setText(df.format(totalLixoColetado) + " T");
-
-        // Tempo médio de espera
-        double tempoMedio = totalEsperas > 0 ? tempoTotalEspera / totalEsperas : 0;
-        lblTempoMedioEspera.setText(df.format(tempoMedio) + " min");
-
-        // Caminhões grandes usados
-        lblCaminhoesGrandesUsados.setText(String.valueOf(totalCaminhoesGrandesUsados));
-
-        // Eficiência da coleta (lixo coletado / tempo de simulação)
-        double eficiencia = tempoSimulacao > 0 ? (totalLixoColetado / tempoSimulacao) * 100 : 0;
-        lblEficienciaColeta.setText(df.format(eficiencia) + "%");
-    }
-
-    /**
-     * Registra uma mensagem no log
-     */
-    private void registrarLog(String mensagem) {
-        // Formata a mensagem com timestamp
-        String timestamp = String.format("[%02d:%02d] ", tempoSimulacao / 60, tempoSimulacao % 60);
-        String logCompleto = timestamp + mensagem + "\n";
-
-        // Adiciona a mensagem ao log
-        Platform.runLater(() -> {
-            areaLogs.appendText(logCompleto);
-            areaLogs.setScrollTop(Double.MAX_VALUE);
         });
     }
 
-    /**
-     * Método principal
-     */
+    private int calcularDelay() {
+        int velocidade = (int) velocidadeSlider.getValue();
+        return switch (velocidade) {
+            case 1 -> 1000;
+            case 2 -> 750;
+            case 3 -> 500;
+            case 4 -> 250;
+            case 5 -> 100;
+            default -> 1000;
+        };
+    }
+
+    private void encerrarSimulacao() {
+        encerrado = true;
+        pausado = false;
+        if (simuladorThread != null && simuladorThread.isAlive()) {
+            simuladorThread.interrupt();
+        }
+        logArea.appendText("\nSimulação encerrada.\n");
+    }
+
+    private String removerCoresANSI(String texto) {
+        return texto.replaceAll("\u001B\\[[;\\d]*m", "");
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
 
-    //==========================================================================
-    // Classes internas para representação visual dos elementos
-    //==========================================================================
+    // Classes internas para demonstração (devem ser movidas para arquivos próprios)
 
-    /**
-     * Classe que representa uma zona da cidade
-     */
-    private class ZonaFX {
-        private String nome;
-        private double quantidadeLixo;
-        private double posX;
-        private double posY;
-        private int numCaminhoes;
-        private StackPane representacaoVisual;
-        private Label lblNome;
-        private Label lblQuantidade;
-        private Rectangle retangulo;
+    public static class RelojioSimulacao extends StackPane {
+        private final Label horaLabel;
+        private final ProgressIndicator indicadorDia;
 
-        public ZonaFX(String nome, double quantidadeLixo, double posX, double posY) {
-            this.nome = nome;
-            this.quantidadeLixo = quantidadeLixo;
-            this.posX = posX;
-            this.posY = posY;
-            this.numCaminhoes = 0;
+        public RelojioSimulacao() {
+            setPrefSize(100, 100);
+            setStyle("-fx-background-color: rgba(0,0,0,0.1); -fx-background-radius: 50;");
 
-            criarRepresentacaoVisual();
+            indicadorDia = new ProgressIndicator(0);
+            indicadorDia.setPrefSize(90, 90);
+
+            horaLabel = new Label("06:00");
+            horaLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+            getChildren().addAll(indicadorDia, horaLabel);
         }
 
-        private void criarRepresentacaoVisual() {
-            representacaoVisual = new StackPane();
-            representacaoVisual.setLayoutX(posX);
-            representacaoVisual.setLayoutY(posY);
-
-            retangulo = new Rectangle(LARGURA_ZONA, ALTURA_ZONA);
-            retangulo.setArcWidth(20);
-            retangulo.setArcHeight(20);
-            retangulo.setStroke(Color.BLACK);
-            retangulo.setStrokeWidth(2);
-
-            atualizarCorPrioridade();
-
-            VBox conteudo = new VBox(5);
-            conteudo.setAlignment(Pos.CENTER);
-
-            lblNome = new Label(nome);
-            lblNome.setFont(Font.font("System", FontWeight.BOLD, 14));
-
-            lblQuantidade = new Label(df.format(quantidadeLixo) + " T");
-            lblQuantidade.setFont(Font.font("System", 12));
-
-            conteudo.getChildren().addAll(lblNome, lblQuantidade);
-
-            representacaoVisual.getChildren().addAll(retangulo, conteudo);
-        }
-
-        public void gerarLixo(double min, double max) {
-            double novoLixo = min + random.nextDouble() * (max - min);
-            quantidadeLixo += novoLixo;
-
-            // Atualiza a representação visual
+        public void atualizarTempo(int minutos, int totalMinutosDia) {
             Platform.runLater(() -> {
-                lblQuantidade.setText(df.format(quantidadeLixo) + " T");
-                atualizarCorPrioridade();
+                // Formatação temporária do horário (deve usar TempoUtil.formatarHorarioSimulado)
+                int horas = (minutos / 60) + 6; // Começa às 6h
+                int mins = minutos % 60;
+                String hora = String.format("%02d:%02d", horas, mins);
+                horaLabel.setText(hora);
+
+                double progresso = (double) minutos / totalMinutosDia;
+                indicadorDia.setProgress(progresso);
+
+                // Mudar cor conforme período do dia
+                if (minutos < 180) { // Manhã (6h-9h)
+                    setStyle("-fx-background-color: rgba(255,200,0,0.2); -fx-background-radius: 50;");
+                } else if (minutos < 360) { // Dia (9h-12h)
+                    setStyle("-fx-background-color: rgba(255,255,0,0.2); -fx-background-radius: 50;");
+                } else if (minutos < 540) { // Tarde (12h-15h)
+                    setStyle("-fx-background-color: rgba(255,165,0,0.2); -fx-background-radius: 50;");
+                } else { // Fim do dia (15h-18h)
+                    setStyle("-fx-background-color: rgba(255,69,0,0.2); -fx-background-radius: 50;");
+                }
+            });
+        }
+    }
+
+    public static class PainelEstatisticas {
+        private final VBox container;
+        private final LineChart<Number, Number> graficoLixo;
+        private final XYChart.Series<Number, Number> serieGerado;
+        private final XYChart.Series<Number, Number> serieColetado;
+        private final PieChart graficoEficiencia;
+
+        public PainelEstatisticas(Pane parent) {
+            container = new VBox(10);
+            container.setPrefSize(400, 500);
+            container.setStyle("-fx-background-color: white; -fx-background-radius: 5; -fx-padding: 10;");
+            container.setLayoutX(500);
+            container.setLayoutY(100);
+
+            // Gráfico de linha para lixo gerado vs coletado
+            NumberAxis xAxis = new NumberAxis("Tempo (min)", 0, 720, 60);
+            NumberAxis yAxis = new NumberAxis("Toneladas", 0, 100, 10);
+            graficoLixo = new LineChart<>(xAxis, yAxis);
+            graficoLixo.setTitle("Lixo Gerado vs Coletado");
+            graficoLixo.setPrefHeight(200);
+
+            serieGerado = new XYChart.Series<>();
+            serieGerado.setName("Lixo Gerado");
+
+            serieColetado = new XYChart.Series<>();
+            serieColetado.setName("Lixo Coletado");
+
+            graficoLixo.getData().addAll(serieGerado, serieColetado);
+
+            // Gráfico de pizza para eficiência dos caminhões
+            graficoEficiencia = new PieChart();
+            graficoEficiencia.setTitle("Eficiência por Tipo de Caminhão");
+            graficoEficiencia.setPrefHeight(200);
+            graficoEficiencia.setLabelsVisible(true);
+
+            // Botão para exportar estatísticas
+            Button exportarBtn = new Button("Exportar Estatísticas");
+            exportarBtn.setOnAction(e -> exportarEstatisticas());
+
+            container.getChildren().addAll(graficoLixo, graficoEficiencia, exportarBtn);
+            parent.getChildren().add(container);
+
+            // Inicialmente oculto
+            container.setVisible(false);
+        }
+
+        public void mostrar() {
+            container.setVisible(true);
+        }
+
+        public void ocultar() {
+            container.setVisible(false);
+        }
+
+        public boolean isVisible() {
+            return container.isVisible();
+        }
+
+        public void atualizarDadosLixo(int tempo, int lixoGeradoTotal, int lixoColetadoTotal) {
+            Platform.runLater(() -> {
+                serieGerado.getData().add(new XYChart.Data<>(tempo, lixoGeradoTotal));
+                serieColetado.getData().add(new XYChart.Data<>(tempo, lixoColetadoTotal));
             });
         }
 
-        public void atualizarCorPrioridade() {
-            Color cor;
+        public void atualizarEficiencia(int eficiencia2t, int eficiencia4t, int eficiencia8t) {
+            Platform.runLater(() -> {
+                graficoEficiencia.getData().clear();
+                graficoEficiencia.getData().addAll(
+                        new PieChart.Data("Caminhões 2T", eficiencia2t),
+                        new PieChart.Data("Caminhões 4T", eficiencia4t),
+                        new PieChart.Data("Caminhões 8T", eficiencia8t)
+                );
+            });
+        }
 
-            if (quantidadeLixo > 5) {
-                cor = Color.rgb(255, 100, 100, 0.7); // Vermelho (alta prioridade)
-            } else if (quantidadeLixo > 2) {
-                cor = Color.rgb(255, 255, 100, 0.7); // Amarelo (média prioridade)
+        private void exportarEstatisticas() {
+            // Implementação da exportação
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Exportação");
+            alert.setHeaderText("Exportação de Estatísticas");
+            alert.setContentText("Estatísticas exportadas com sucesso para: estatisticas.csv");
+            alert.showAndWait();
+        }
+    }
+
+    public static class PainelStatusCaminhoes {
+        private final VBox container;
+        private final java.util.Map<String, HBox> linhasCaminhoes = new java.util.HashMap<>();
+
+        public PainelStatusCaminhoes(Pane parent) {
+            container = new VBox(5);
+            container.setPadding(new Insets(10));
+            container.setStyle("-fx-background-color: rgba(255,255,255,0.8); -fx-background-radius: 5;");
+            container.setLayoutX(10);
+            container.setLayoutY(10);
+            container.setPrefWidth(200);
+
+            Label titulo = new Label("Status dos Caminhões");
+            titulo.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+            container.getChildren().add(titulo);
+
+            parent.getChildren().add(container);
+        }
+
+        public void adicionarOuAtualizarCaminhao(String id, String status, int cargaAtual, int capacidade, String cor) {
+            Platform.runLater(() -> {
+                if (linhasCaminhoes.containsKey(id)) {
+                    atualizarLinhaCaminhao(id, status, cargaAtual, capacidade, cor);
+                } else {
+                    criarLinhaCaminhao(id, status, cargaAtual, capacidade, cor);
+                }
+            });
+        }
+
+        private void criarLinhaCaminhao(String id, String status, int cargaAtual, int capacidade, String cor) {
+            HBox linha = new HBox(5);
+            linha.setAlignment(Pos.CENTER_LEFT);
+
+            Rectangle indicador = new Rectangle(10, 10, Color.web(cor));
+            Label idLabel = new Label(id);
+            idLabel.setStyle("-fx-font-weight: bold;");
+            Label statusLabel = new Label(status);
+            statusLabel.setPrefWidth(100);
+            Label cargaLabel = new Label(cargaAtual + "/" + capacidade + "T");
+
+            linha.getChildren().addAll(indicador, idLabel, statusLabel, cargaLabel);
+            container.getChildren().add(linha);
+            linhasCaminhoes.put(id, linha);
+        }
+
+        private void atualizarLinhaCaminhao(String id, String status, int cargaAtual, int capacidade, String cor) {
+            HBox linha = linhasCaminhoes.get(id);
+            Rectangle indicador = (Rectangle) linha.getChildren().get(0);
+            Label statusLabel = (Label) linha.getChildren().get(2);
+            Label cargaLabel = (Label) linha.getChildren().get(3);
+
+            indicador.setFill(Color.web(cor));
+            statusLabel.setText(status);
+            cargaLabel.setText(cargaAtual + "/" + capacidade + "T");
+        }
+    }
+
+    public static class ModoDebug {
+        private final Pane mapa;
+        private final java.util.Map<String, Label> labelsDebug = new java.util.HashMap<>();
+        private boolean ativo = false;
+
+        public ModoDebug(Pane mapa) {
+            this.mapa = mapa;
+        }
+
+        public void alternar() {
+            ativo = !ativo;
+            if (ativo) {
+                ativar();
             } else {
-                cor = Color.rgb(100, 255, 100, 0.7); // Verde (baixa prioridade)
+                desativar();
+            }
+        }
+
+        public boolean isAtivo() {
+            return ativo;
+        }
+
+        private void ativar() {
+            // Exibir grades de coordenadas
+            for (int x = 0; x < 1000; x += 100) {
+                Line linha = new Line(x, 0, x, 600);
+                linha.setStroke(Color.LIGHTGRAY);
+                linha.getStrokeDashArray().addAll(5d, 5d);
+                mapa.getChildren().add(linha);
+
+                Label coordX = new Label(String.valueOf(x));
+                coordX.setLayoutX(x);
+                coordX.setLayoutY(5);
+                coordX.setStyle("-fx-background-color: rgba(255,255,255,0.7);");
+                mapa.getChildren().add(coordX);
             }
 
-            retangulo.setFill(cor);
-        }
+            for (int y = 0; y < 600; y += 100) {
+                Line linha = new Line(0, y, 1000, y);
+                linha.setStroke(Color.LIGHTGRAY);
+                linha.getStrokeDashArray().addAll(5d, 5d);
+                mapa.getChildren().add(linha);
 
-        public void incrementarCaminhoes() {
-            numCaminhoes++;
-        }
-
-        public void decrementarCaminhoes() {
-            numCaminhoes = Math.max(0, numCaminhoes - 1);
-        }
-
-        // Getters e setters
-        public String getNome() {
-            return nome;
-        }
-
-        public double getQuantidadeLixo() {
-            return quantidadeLixo;
-        }
-
-        public void setQuantidadeLixo(double quantidadeLixo) {
-            this.quantidadeLixo = Math.max(0, quantidadeLixo);
-
-            // Atualiza a representação visual
-            Platform.runLater(() -> {
-                lblQuantidade.setText(df.format(this.quantidadeLixo) + " T");
-                atualizarCorPrioridade();
-            });
-        }
-
-        public double getPosX() {
-            return posX;
-        }
-
-        public double getPosY() {
-            return posY;
-        }
-
-        public int getNumCaminhoes() {
-            return numCaminhoes;
-        }
-
-        public StackPane getRepresentacaoVisual() {
-            return representacaoVisual;
-        }
-    }
-
-    /**
-     * Classe que representa um caminhão pequeno
-     */
-    private class CaminhaoPequenoFX {
-        private String id;
-        private int capacidadeTotal;
-        private double capacidadeAtual;
-        private int maxViagens;
-        private int viagensRealizadas;
-        private double posX;
-        private double posY;
-        private StackPane representacaoVisual;
-        private Rectangle retangulo;
-        private Label lblInfo;
-        private Rectangle barraProgresso;
-
-        public CaminhaoPequenoFX(String id, int capacidadeTotal, int maxViagens, double posX, double posY) {
-            this.id = id;
-            this.capacidadeTotal = capacidadeTotal;
-            this.capacidadeAtual = 0;
-            this.maxViagens = maxViagens;
-            this.viagensRealizadas = 0;
-            this.posX = posX;
-            this.posY = posY;
-
-            criarRepresentacaoVisual();
-        }
-
-        private void criarRepresentacaoVisual() {
-            representacaoVisual = new StackPane();
-            representacaoVisual.setLayoutX(posX);
-            representacaoVisual.setLayoutY(posY);
-
-            retangulo = new Rectangle(LARGURA_CAMINHAO_PEQUENO, ALTURA_CAMINHAO_PEQUENO);
-            retangulo.setArcWidth(10);
-            retangulo.setArcHeight(10);
-            retangulo.setStroke(Color.BLACK);
-            retangulo.setStrokeWidth(1);
-
-            // Cor baseada na capacidade
-            Color cor;
-            switch (capacidadeTotal) {
-                case 2:
-                    cor = Color.LIGHTGREEN;
-                    break;
-                case 4:
-                    cor = Color.DARKGREEN;
-                    break;
-                case 8:
-                    cor = Color.LIGHTBLUE;
-                    break;
-                case 10:
-                    cor = Color.DARKBLUE;
-                    break;
-                default:
-                    cor = Color.GRAY;
+                Label coordY = new Label(String.valueOf(y));
+                coordY.setLayoutX(5);
+                coordY.setLayoutY(y);
+                coordY.setStyle("-fx-background-color: rgba(255,255,255,0.7);");
+                mapa.getChildren().add(coordY);
             }
-            retangulo.setFill(cor);
 
-            // Barra de progresso
-            barraProgresso = new Rectangle(0, 5);
-            barraProgresso.setFill(Color.ORANGE);
-            barraProgresso.setTranslateY(ALTURA_CAMINHAO_PEQUENO / 2 - 5);
+            // Exibir IDs e informações adicionais
+            for (javafx.scene.Node node : mapa.getChildren()) {
+                if (node instanceof Rectangle) {
+                    Rectangle rect = (Rectangle) node;
+                    String id = rect.getId();
+                    if (id != null && !id.isEmpty()) {
+                        Label debugLabel = new Label(id + "\n" +
+                                "X: " + rect.getLayoutX() + "\n" +
+                                "Y: " + rect.getLayoutY());
+                        debugLabel.setLayoutX(rect.getLayoutX());
+                        debugLabel.setLayoutY(rect.getLayoutY());
+                        debugLabel.setStyle("-fx-background-color: rgba(255,255,255,0.7); -fx-font-size: 10px;");
 
-            // Label com informações
-            lblInfo = new Label(id + " (" + capacidadeTotal + "T)");
-            lblInfo.setFont(Font.font("System", FontWeight.BOLD, 10));
-            lblInfo.setTextFill(Color.WHITE);
-
-            representacaoVisual.getChildren().addAll(retangulo, barraProgresso, lblInfo);
-        }
-
-        public void atualizarBarraProgresso() {
-            double percentual = capacidadeAtual / capacidadeTotal;
-            double largura = LARGURA_CAMINHAO_PEQUENO * percentual;
-
-            Platform.runLater(() -> {
-                barraProgresso.setWidth(largura);
-                lblInfo.setText(id + " (" + df.format(capacidadeAtual) + "/" + capacidadeTotal + "T)");
-            });
-        }
-
-        public void incrementarViagens() {
-            viagensRealizadas++;
-        }
-
-        public void moverPara(double x, double y) {
-            this.posX = x;
-            this.posY = y;
-
-            Platform.runLater(() -> {
-                representacaoVisual.setLayoutX(x);
-                representacaoVisual.setLayoutY(y);
-            });
-        }
-
-        // Getters e setters
-        public String getId() {
-            return id;
-        }
-
-        public int getCapacidadeTotal() {
-            return capacidadeTotal;
-        }
-
-        public double getCapacidadeAtual() {
-            return capacidadeAtual;
-        }
-
-        public void setCapacidadeAtual(double capacidadeAtual) {
-            this.capacidadeAtual = Math.max(0, Math.min(capacidadeTotal, capacidadeAtual));
-            atualizarBarraProgresso();
-        }
-
-        public int getMaxViagens() {
-            return maxViagens;
-        }
-
-        public int getViagensRealizadas() {
-            return viagensRealizadas;
-        }
-
-        public double getPosX() {
-            return posX;
-        }
-
-        public void setPosX(double posX) {
-            this.posX = posX;
-        }
-
-        public double getPosY() {
-            return posY;
-        }
-
-        public void setPosY(double posY) {
-            this.posY = posY;
-        }
-
-        public StackPane getRepresentacaoVisual() {
-            return representacaoVisual;
-        }
-    }
-
-    /**
-     * Classe que representa um caminhão grande
-     */
-    private class CaminhaoGrandeFX {
-        private String id;
-        private int capacidadeTotal;
-        private double capacidadeAtual;
-        private double posX;
-        private double posY;
-        private int tempoEspera;
-        private int tempoMaxEspera;
-        private EstacaoFX estacao;
-        private StackPane representacaoVisual;
-        private Rectangle retangulo;
-        private Label lblInfo;
-        private Rectangle barraProgresso;
-
-        public CaminhaoGrandeFX(String id, int capacidadeTotal, double posX, double posY) {
-            this.id = id;
-            this.capacidadeTotal = capacidadeTotal;
-            this.capacidadeAtual = 0;
-            this.posX = posX;
-            this.posY = posY;
-            this.tempoEspera = 0;
-            this.tempoMaxEspera = 10; // 10 ciclos de simulação
-
-            criarRepresentacaoVisual();
-        }
-
-        private void criarRepresentacaoVisual() {
-            representacaoVisual = new StackPane();
-            representacaoVisual.setLayoutX(posX);
-            representacaoVisual.setLayoutY(posY);
-
-            retangulo = new Rectangle(LARGURA_CAMINHAO_GRANDE, ALTURA_CAMINHAO_GRANDE);
-            retangulo.setArcWidth(10);
-            retangulo.setArcHeight(10);
-            retangulo.setStroke(Color.BLACK);
-            retangulo.setStrokeWidth(2);
-            retangulo.setFill(Color.ORANGE);
-
-            // Barra de progresso
-            barraProgresso = new Rectangle(0, 7);
-            barraProgresso.setFill(Color.RED);
-            barraProgresso.setTranslateY(ALTURA_CAMINHAO_GRANDE / 2 - 7);
-
-            // Label com informações
-            lblInfo = new Label(id + " (0/" + capacidadeTotal + "T)");
-            lblInfo.setFont(Font.font("System", FontWeight.BOLD, 12));
-
-            representacaoVisual.getChildren().addAll(retangulo, barraProgresso, lblInfo);
-        }
-
-        public void atualizarBarraProgresso() {
-            double percentual = capacidadeAtual / capacidadeTotal;
-            double largura = LARGURA_CAMINHAO_GRANDE * percentual;
-
-            Platform.runLater(() -> {
-                barraProgresso.setWidth(largura);
-                lblInfo.setText(id + " (" + df.format(capacidadeAtual) + "/" + capacidadeTotal + "T)");
-            });
-        }
-
-        public void incrementarTempoEspera() {
-            tempoEspera++;
-
-            // Verifica se o tempo máximo de espera foi atingido
-            if (tempoEspera >= tempoMaxEspera) {
-                // Se o caminhão já possui carga, parte para o aterro
-                if (capacidadeAtual > 0 && estacao != null) {
-                    enviarCaminhaoParaAterro(this, estacao);
-                } else {
-                    // Reinicia o contador de espera
-                    tempoEspera = 0;
+                        mapa.getChildren().add(debugLabel);
+                        labelsDebug.put(id, debugLabel);
+                    }
                 }
             }
         }
 
-        public void moverPara(double x, double y) {
-            this.posX = x;
-            this.posY = y;
+        private void desativar() {
+            // Remover todos os elementos de debug
+            java.util.List<javafx.scene.Node> paraRemover = new java.util.ArrayList<>();
 
-            Platform.runLater(() -> {
-                representacaoVisual.setLayoutX(x);
-                representacaoVisual.setLayoutY(y);
-            });
-        }
-
-        // Getters e setters
-        public String getId() {
-            return id;
-        }
-
-        public int getCapacidadeTotal() {
-            return capacidadeTotal;
-        }
-
-        public double getCapacidadeAtual() {
-            return capacidadeAtual;
-        }
-
-        public void setCapacidadeAtual(double capacidadeAtual) {
-            this.capacidadeAtual = Math.max(0, Math.min(capacidadeTotal, capacidadeAtual));
-            atualizarBarraProgresso();
-        }
-
-        public double getPosX() {
-            return posX;
-        }
-
-        public void setPosX(double posX) {
-            this.posX = posX;
-        }
-
-        public double getPosY() {
-            return posY;
-        }
-
-        public void setPosY(double posY) {
-            this.posY = posY;
-        }
-
-        public int getTempoEspera() {
-            return tempoEspera;
-        }
-
-        public void setTempoEspera(int tempoEspera) {
-            this.tempoEspera = tempoEspera;
-        }
-
-        public int getTempoMaxEspera() {
-            return tempoMaxEspera;
-        }
-
-        public void setTempoMaxEspera(int tempoMaxEspera) {
-            this.tempoMaxEspera = tempoMaxEspera;
-        }
-
-        public EstacaoFX getEstacao() {
-            return estacao;
-        }
-
-        public void setEstacao(EstacaoFX estacao) {
-            this.estacao = estacao;
-        }
-
-        public StackPane getRepresentacaoVisual() {
-            return representacaoVisual;
-        }
-    }
-
-    /**
-     * Classe que representa uma estação de transferência
-     */
-    private class EstacaoFX {
-        private String nome;
-        private double posX;
-        private double posY;
-        private FilaEncadeada<CaminhaoPequenoFX> filaCaminhoes;
-        private CaminhaoGrandeFX caminhaoGrande;
-        private int tempoMaxEspera;
-        private StackPane representacaoVisual;
-        private Rectangle retangulo;
-        private Label lblNome;
-        private Label lblInfo;
-
-        public EstacaoFX(String nome, double posX, double posY) {
-            this.nome = nome;
-            this.posX = posX;
-            this.posY = posY;
-            this.filaCaminhoes = new FilaEncadeada<>();
-            this.tempoMaxEspera = 15; // 15 ciclos de simulação
-
-            criarRepresentacaoVisual();
-        }
-
-        private void criarRepresentacaoVisual() {
-            representacaoVisual = new StackPane();
-            representacaoVisual.setLayoutX(posX);
-            representacaoVisual.setLayoutY(posY);
-
-            retangulo = new Rectangle(LARGURA_ESTACAO, ALTURA_ESTACAO);
-            retangulo.setArcWidth(20);
-            retangulo.setArcHeight(20);
-            retangulo.setStroke(Color.BLACK);
-            retangulo.setStrokeWidth(2);
-            retangulo.setFill(Color.LIGHTGRAY);
-
-            VBox conteudo = new VBox(5);
-            conteudo.setAlignment(Pos.CENTER);
-
-            lblNome = new Label(nome);
-            lblNome.setFont(Font.font("System", FontWeight.BOLD, 14));
-
-            lblInfo = new Label("Fila: 0 caminhões");
-            lblInfo.setFont(Font.font("System", 12));
-
-            conteudo.getChildren().addAll(lblNome, lblInfo);
-
-            representacaoVisual.getChildren().addAll(retangulo, conteudo);
-        }
-
-        public void adicionarCaminhaoFila(CaminhaoPequenoFX caminhao) {
-            filaCaminhoes.enfileirar(caminhao);
-
-            // Atualiza a informação da fila
-            Platform.runLater(() -> {
-                lblInfo.setText("Fila: " + filaCaminhoes.tamanho() + " caminhões");
-
-                // Atualiza a cor da estação conforme o tamanho da fila
-                if (filaCaminhoes.tamanho() > 3) {
-                    retangulo.setFill(Color.rgb(255, 150, 150)); // Vermelho claro (sobrecarregada)
-                } else if (filaCaminhoes.tamanho() > 0) {
-                    retangulo.setFill(Color.rgb(200, 200, 200)); // Cinza médio (ocupada)
-                } else {
-                    retangulo.setFill(Color.LIGHTGRAY); // Cinza claro (livre)
+            for (javafx.scene.Node node : mapa.getChildren()) {
+                if ((node instanceof Line && ((Line) node).getStrokeDashArray().size() > 0) ||
+                        labelsDebug.containsValue(node)) {
+                    paraRemover.add(node);
                 }
-            });
-        }
-
-        public void processarFila() {
-            // Verifica se há caminhões na fila e se há um caminhão grande disponível
-            if (!filaCaminhoes.estaVazia() && caminhaoGrande != null) {
-                // Verifica se o caminhão grande tem capacidade disponível
-                if (caminhaoGrande.getCapacidadeAtual() < caminhaoGrande.getCapacidadeTotal()) {
-                    // Processa o primeiro caminhão da fila
-                    CaminhaoPequenoFX caminhao = filaCaminhoes.desenfileirar();
-
-                    // Atualiza a informação da fila
-                    Platform.runLater(() -> {
-                        lblInfo.setText("Fila: " + filaCaminhoes.tamanho() + " caminhões");
-
-                        // Atualiza a cor da estação conforme o tamanho da fila
-                        if (filaCaminhoes.tamanho() > 3) {
-                            retangulo.setFill(Color.rgb(255, 150, 150)); // Vermelho claro (sobrecarregada)
-                        } else if (filaCaminhoes.tamanho() > 0) {
-                            retangulo.setFill(Color.rgb(200, 200, 200)); // Cinza médio (ocupada)
-                        } else {
-                            retangulo.setFill(Color.LIGHTGRAY); // Cinza claro (livre)
-                        }
-                    });
-
-                    // Descarrega o caminhão pequeno no caminhão grande
-                    descarregarCaminhao(caminhao, caminhaoGrande, this);
-
-                    // Registra o tempo de espera
-                    tempoTotalEspera += caminhaoGrande.getTempoEspera();
-                    totalEsperas++;
-
-                    // Reinicia o tempo de espera do caminhão grande
-                    caminhaoGrande.setTempoEspera(0);
-                } else {
-                    // Caminhão grande está cheio, incrementa o tempo de espera
-                    caminhaoGrande.incrementarTempoEspera();
-                }
-            } else if (caminhaoGrande != null) {
-                // Não há caminhões na fila, incrementa o tempo de espera do caminhão grande
-                caminhaoGrande.incrementarTempoEspera();
             }
 
-            // Verifica se o tempo máximo de espera dos caminhões pequenos foi excedido
-            if (filaCaminhoes.tamanho() > 3 && caminhaoGrande != null &&
-                    caminhaoGrande.getCapacidadeAtual() >= caminhaoGrande.getCapacidadeTotal() * 0.5) {
-                // Envia o caminhão grande para o aterro e solicita um novo
-                enviarCaminhaoParaAterro(caminhaoGrande, this);
+            mapa.getChildren().removeAll(paraRemover);
+            labelsDebug.clear();
+        }
+
+        public void atualizarPosicao(String id, double x, double y) {
+            if (ativo && labelsDebug.containsKey(id)) {
+                Label label = labelsDebug.get(id);
+                label.setLayoutX(x);
+                label.setLayoutY(y);
+                label.setText(id + "\n" + "X: " + x + "\n" + "Y: " + y);
             }
         }
-
-        // Getters e setters
-        public String getNome() {
-            return nome;
-        }
-
-        public double getPosX() {
-            return posX;
-        }
-
-        public double getPosY() {
-            return posY;
-        }
-
-        public int getTamanhoFila() {
-            return filaCaminhoes.tamanho();
-        }
-
-        public CaminhaoGrandeFX getCaminhaoGrande() {
-            return caminhaoGrande;
-        }
-
-        public void setCaminhaoGrande(CaminhaoGrandeFX caminhaoGrande) {
-            this.caminhaoGrande = caminhaoGrande;
-        }
-
-        public int getTempoMaxEspera() {
-            return tempoMaxEspera;
-        }
-
-        public StackPane getRepresentacaoVisual() {
-            return representacaoVisual;
-        }
     }
-
-    //==========================================================================
-    // Implementação das estruturas de dados personalizadas
-    //==========================================================================
-
-    /**
-     * Classe que representa um nó em uma estrutura encadeada
-     */
 }

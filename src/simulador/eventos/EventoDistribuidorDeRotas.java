@@ -14,12 +14,12 @@ public class EventoDistribuidorDeRotas {
     /**
      * Cria caminhões pequenos com rotas balanceadas e agenda os primeiros eventos de coleta.
      *
-     * @param zonas lista de zonas disponíveis
+     * @param zonas               lista de zonas disponíveis
      * @param quantidadeCaminhoes total de caminhões a serem criados
-     * @param viagensPorCaminhao número de viagens que cada caminhão realizará
+     * @param viagensPorCaminhao  número de viagens que cada caminhão realizará
      * @return lista com todos os caminhões criados
      */
-    public static Lista<CaminhaoPequeno> distribuir(Lista<Zona> zonas, int quantidadeCaminhoes, int viagensPorCaminhao) {
+    public static Lista<CaminhaoPequeno> distribuir(Lista<Zona> zonas, int quantidadeCaminhoes, int viagensPorCaminhao, int capacidadeCaminhao) {
         Lista<CaminhaoPequeno> caminhoes = new Lista<>();
         int quantidadeZonas = zonas.getTamanho();
 
@@ -32,8 +32,9 @@ public class EventoDistribuidorDeRotas {
                 rotaCaminhao.adicionar(j, zonaAlvo);
             }
 
-            String id = "C" + (i + 1);
-            int capacidade = 5; // podemos parametrizar isso futuramente
+            String id = "C" + capacidadeCaminhao + "-" + (i + 1);
+
+            int capacidade = capacidadeCaminhao; // podemos parametrizar isso futuramente
 
             CaminhaoPequeno caminhao = new CaminhaoPequeno(id, capacidade, viagensPorCaminhao, rotaCaminhao);
             caminhoes.adicionar(i, caminhao);

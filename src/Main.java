@@ -13,7 +13,7 @@ public class Main {
      * @param args Argumentos de linha de comando (não utilizados)
      */
     public static void main(String[] args) {
-        Simulador test = new Simulador();
-        test.iniciarSimulacao();
+        Simulador sim = new Simulador();
+        sim.iniciarSimulacao();
     }
 }
