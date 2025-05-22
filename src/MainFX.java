@@ -9,7 +9,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import simulador.configuracao.ParametrosSimulacao;
-import simulador.ui.TelaConfiguracao;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -25,6 +24,7 @@ public class MainFX extends Application {
     private Thread simuladorThread;
     private volatile boolean pausado = false;
     private volatile boolean encerrado = false;
+    private Pane mapa;
 
 
     @Override
@@ -81,12 +81,12 @@ public class MainFX extends Application {
 
 // Campos de texto para entrada manual
         TextField diasField = new TextField("1");
-        TextField c2Field = new TextField("6");
-        TextField v2Field = new TextField("2");
-        TextField c4Field = new TextField("3");
-        TextField v4Field = new TextField("2");
-        TextField c8Field = new TextField("2");
-        TextField v8Field = new TextField("2");
+        TextField c2Field = new TextField("1");
+        TextField v2Field = new TextField("1");
+        TextField c4Field = new TextField("1");
+        TextField v4Field = new TextField("1");
+        TextField c8Field = new TextField("1");
+        TextField v8Field = new TextField("1");
 
         configuracaoBox.getChildren().addAll(
                 configTitulo,
@@ -99,75 +99,86 @@ public class MainFX extends Application {
                 new Label("Viagens por caminhão 8t:"), v8Field
         );
 
+
         root.setLeft(configuracaoBox);
 
-        // Mapa de zonas + estações
-        GridPane mapa = new GridPane();
-        mapa.setPadding(new Insets(20));
-        mapa.setHgap(40);
-        mapa.setVgap(30);
+        // === NOVO MAPA BASEADO EM Pane ===
+        mapa = new Pane();
+        mapa.setPrefSize(1000, 600);
+        mapa.setStyle("-fx-background-color: #f9f9f9;");
 
+// Posicionamento manual das zonas
         String[][] zonas = {
-                {"Zona Norte", "#A5D6A7"},
-                {"Zona Sul", "#90CAF9"},
-                {"Zona Sudeste", "#FFF59D"},
-                {"Zona Leste", "#CE93D8"},
-                {"Centro", "#FFAB91"}
+                {"Norte", "#A5D6A7", "100", "50"},
+                {"Sul", "#90CAF9", "100", "200"},
+                {"Centro", "#FFAB91", "300", "70"},
+                {"Sudeste", "#FFF59D", "300", "230"},
+                {"Leste", "#CE93D8", "500", "150"}
         };
 
-        int row = 0;
         for (String[] zona : zonas) {
-            VBox box = new VBox(10);
-            box.setAlignment(Pos.CENTER);
-            Label label = new Label(zona[0]);
-            label.setStyle("-fx-font-weight: bold;");
-            Rectangle rect = new Rectangle(150, 100, Color.web(zona[1]));
-            box.getChildren().addAll(label, rect);
-            mapa.add(box, row % 3, row / 3);
-            row++;
+            String nome = zona[0];
+            String cor = zona[1];
+            double x = Double.parseDouble(zona[2]);
+            double y = Double.parseDouble(zona[3]);
+
+            Rectangle rect = new Rectangle(150, 100, Color.web(cor));
+            rect.setArcWidth(12);
+            rect.setArcHeight(12);
+            rect.setLayoutX(x);
+            rect.setLayoutY(y);
+
+            Label label = new Label("Zona " + nome);
+            label.setLayoutX(x + 40);
+            label.setLayoutY(y + 40);
+            label.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+
+            mapa.getChildren().addAll(rect, label);
         }
 
-        VBox estacoes = new VBox(20);
-        estacoes.setPadding(new Insets(20));
-        estacoes.setAlignment(Pos.CENTER_LEFT);
-        Label estTitulo = new Label("Estações de Transferência");
-        estTitulo.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        estacoes.getChildren().add(estTitulo);
+// Posicionamento manual das estações
+        Rectangle estA = new Rectangle(100, 60, Color.LIGHTBLUE);
+        estA.setLayoutX(800);
+        estA.setLayoutY(120);
+        Label labelA = new Label("Estação A");
+        labelA.setLayoutX(810);
+        labelA.setLayoutY(130);
+        labelA.setStyle("-fx-font-weight: bold;");
 
-        for (String estacao : new String[]{"Estação A", "Estação B"}) {
-            HBox linha = new HBox(10);
-            linha.setAlignment(Pos.CENTER_LEFT);
-            Rectangle rec = new Rectangle(100, 60, Color.LIGHTBLUE);
-            linha.getChildren().addAll(new Label(estacao), rec);
-            estacoes.getChildren().add(linha);
-        }
+        Rectangle estB = new Rectangle(100, 60, Color.LIGHTBLUE);
+        estB.setLayoutX(800);
+        estB.setLayoutY(220);
+        Label labelB = new Label("Estação B");
+        labelB.setLayoutX(810);
+        labelB.setLayoutY(230);
+        labelB.setStyle("-fx-font-weight: bold;");
 
-        HBox centro = new HBox(60, mapa, estacoes);
-        centro.setPadding(new Insets(20));
-        centro.setAlignment(Pos.TOP_CENTER);
-        root.setCenter(centro);
+        mapa.getChildren().addAll(estA, labelA, estB, labelB);
+
+// Adiciona ao centro
+        root.setCenter(mapa);
 
         // Ações dos botões
-iniciarBtn.setOnAction(e -> {
-    try {
-        ParametrosSimulacao.Parametros parametrosSelecionados = new ParametrosSimulacao.Parametros(
-            Integer.parseInt(diasField.getText().trim()),
-            Integer.parseInt(c2Field.getText().trim()), Integer.parseInt(v2Field.getText().trim()),
-            Integer.parseInt(c4Field.getText().trim()), Integer.parseInt(v4Field.getText().trim()),
-            Integer.parseInt(c8Field.getText().trim()), Integer.parseInt(v8Field.getText().trim())
-        );
+        iniciarBtn.setOnAction(e -> {
+            try {
+                ParametrosSimulacao.Parametros parametrosSelecionados = new ParametrosSimulacao.Parametros(
+                        Integer.parseInt(diasField.getText().trim()),
+                        Integer.parseInt(c2Field.getText().trim()), Integer.parseInt(v2Field.getText().trim()),
+                        Integer.parseInt(c4Field.getText().trim()), Integer.parseInt(v4Field.getText().trim()),
+                        Integer.parseInt(c8Field.getText().trim()), Integer.parseInt(v8Field.getText().trim())
+                );
 
-        ParametrosSimulacao.setParametrosExternos(parametrosSelecionados);
-        iniciarSimulacao();
+                ParametrosSimulacao.setParametrosExternos(parametrosSelecionados);
+                iniciarSimulacao();
 
-    } catch (NumberFormatException ex) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Erro de Entrada");
-        alert.setHeaderText("Parâmetros inválidos");
-        alert.setContentText("Por favor, insira apenas números inteiros válidos nos campos.");
-        alert.showAndWait();
-    }
-});
+            } catch (NumberFormatException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erro de Entrada");
+                alert.setHeaderText("Parâmetros inválidos");
+                alert.setContentText("Por favor, insira apenas números inteiros válidos nos campos.");
+                alert.showAndWait();
+            }
+        });
 
         pausarBtn.setOnAction(e -> pausado = !pausado);
         encerrarBtn.setOnAction(e -> encerrarSimulacao());
@@ -181,6 +192,9 @@ iniciarBtn.setOnAction(e -> {
         logArea.clear();
         encerrado = false;
         pausado = false;
+
+        // ✅ Instancia o controlador gráfico da simulação
+        new simulador.ui.SimuladorFXController(mapa, logArea, velocidadeSlider);
 
         simuladorThread = new Thread(() -> {
             try {

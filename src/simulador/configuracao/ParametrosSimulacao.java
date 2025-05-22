@@ -1,6 +1,5 @@
 package simulador.configuracao;
 
-import simulador.ui.TelaConfiguracao;
 
 /**
  * Classe contendo todos os parâmetros de configuração da simulação.
