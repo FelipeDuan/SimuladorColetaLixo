@@ -22,6 +22,12 @@ public class Simulador {
      * inicial de zonas, estações, caminhões e eventos.
      */
     public void iniciarSimulacao() {
+        System.out.println();
+        System.out.println(ConsoleCor.AMARELO + "=================== S I M U L A D O R ==================");
+        System.out.println();
+
+        System.out.println();
+
         // 1. Cria as 2 estações
         EstacaoDeTransferencia estA = new EstacaoDeTransferencia("A");
         EstacaoDeTransferencia estB = new EstacaoDeTransferencia("B");
@@ -30,6 +36,7 @@ public class Simulador {
         MapeadorZonas.configurar(estA, estB);
 
         // 3. Inicializa zonas e gera lixo diário
+        System.out.println("==================== GERANDO ZONAS =====================");
         Lista<Zona> zonas = inicializarZonas();
 
         for (int i = 0; i < zonas.getTamanho(); i++) {
@@ -49,8 +56,6 @@ public class Simulador {
 
 
         // 5. Inicia o processamento da simulação
-        System.out.println();
-        System.out.println(ConsoleCor.AMARELO + "=================== S I M U L A D O R ==================");
         System.out.println("Iniciando simulação de coleta de lixo em Teresina\n");
 
         AgendaEventos.processarEventos();
