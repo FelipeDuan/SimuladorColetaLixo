@@ -77,6 +77,21 @@ public class EventoTransferenciaParaEstacao extends Evento {
         System.out.printf("  • Horário previsto de chegada: %s%n", TempoUtil.formatarHorarioSimulado(tempoAtual + tempoDetalhado.tempoTotal));
         System.out.println();
 
+        // 🔁 ANIMAÇÃO (se estiver no modo gráfico)
+        if (simulador.ui.SimuladorFXController.isInstanciado()) {
+            var controller = simulador.ui.SimuladorFXController.getInstancia();
+            String nomeEstacao = estacaoDestino.getNomeEstacao(); // "A" ou "B"
+            String nomeCompleto = "Estação " + nomeEstacao;
+
+            controller.animarTransferencia(
+                    caminhaoPequeno.getId(),
+                    nomeCompleto,
+                    caminhaoPequeno.getCargaAtual(),
+                    caminhaoPequeno.getCapacidadeMaxima(),
+                    tempoDetalhado.tempoTotal
+            );
+        }
+
         // 6) Agenda o evento de chegada à estação
         AgendaEventos.adicionarEvento(
                 new EventoEstacaoTransferencia(
