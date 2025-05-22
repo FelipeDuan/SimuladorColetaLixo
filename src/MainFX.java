@@ -80,11 +80,11 @@ public class MainFX extends Application {
         configTitulo.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
 // Campos de texto para entrada manual
-        TextField diasField = new TextField("5");
-        TextField c2Field = new TextField("8");
+        TextField diasField = new TextField("1");
+        TextField c2Field = new TextField("6");
         TextField v2Field = new TextField("2");
-        TextField c4Field = new TextField("5");
-        TextField v4Field = new TextField("3");
+        TextField c4Field = new TextField("3");
+        TextField v4Field = new TextField("2");
         TextField c8Field = new TextField("2");
         TextField v8Field = new TextField("2");
 
