@@ -58,7 +58,7 @@ public class Simulador {
         int tempoFinal = AgendaEventos.getTempoUltimoEvento();
 
         System.out.println();
-        System.out.println(ConsoleCor.RESET + "===========================================================");
+        System.out.println(ConsoleCor.RESET + "================== SIMULAÇÃO ENCERRADA ===================");
         System.out.println("Simulação finalizada com sucesso!");
         System.out.println("Tempo total: " + TempoUtil.formatarDuracao(tempoFinal) + " (encerra às " + TempoUtil.formatarHorarioSimulado(tempoFinal) + ")");
         System.out.println("[LIXO FINAL POR ZONA]");
@@ -69,7 +69,14 @@ public class Simulador {
             System.out.println("• " + zona.getNome() + ": " + zona.getLixoAcumulado() + "T");
         }
 
+        System.out.println("\n[RESUMO DOS CAMINHÕES UTILIZADOS]");
+        System.out.printf("• Caminhões de 2t: %d%n", caminhoes2t.getTamanho());
+        System.out.printf("• Caminhões de 4t: %d%n", caminhoes4t.getTamanho());
+        System.out.printf("• Caminhões de 8t: %d%n", caminhoes8t.getTamanho());
+
+        System.out.println();
         System.out.println("===========================================================");
+        System.out.println();
         System.out.println("Último evento processado: " + AgendaEventos.getUltimoEventoExecutado());
     }
 
