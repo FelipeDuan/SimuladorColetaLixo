@@ -1,5 +1,7 @@
 package simulador.configuracao;
 
+import simulador.ui.TelaConfiguracao;
+
 /**
  * Classe contendo todos os parâmetros de configuração da simulação.
  * <p>
@@ -8,6 +10,45 @@ package simulador.configuracao;
  * campos estáticos e um construtor privado.
  */
 public class ParametrosSimulacao {
+
+    public static int DIAS_DE_SIMULACAO;
+    public static int QTD_CAMINHOES_2T;
+    public static int QTD_CAMINHOES_4T;
+    public static int QTD_CAMINHOES_8T;
+    public static int VIAGENS_2T;
+    public static int VIAGENS_4T;
+    public static int VIAGENS_8T;
+
+    public static void setParametrosExternos(Parametros p) {
+        DIAS_DE_SIMULACAO = p.dias;
+        QTD_CAMINHOES_2T = p.qtd2t;
+        VIAGENS_2T = p.viagens2t;
+        QTD_CAMINHOES_4T = p.qtd4t;
+        VIAGENS_4T = p.viagens4t;
+        QTD_CAMINHOES_8T = p.qtd8t;
+        VIAGENS_8T = p.viagens8t;
+    }
+
+    public static class Parametros {
+        public final int dias;
+        public final int qtd2t, qtd4t, qtd8t;
+        public final int viagens2t, viagens4t, viagens8t;
+
+        public Parametros(
+            int dias,
+            int qtd2t, int viagens2t,
+            int qtd4t, int viagens4t,
+            int qtd8t, int viagens8t
+        ) {
+            this.dias = dias;
+            this.qtd2t = qtd2t;
+            this.qtd4t = qtd4t;
+            this.qtd8t = qtd8t;
+            this.viagens2t = viagens2t;
+            this.viagens4t = viagens4t;
+            this.viagens8t = viagens8t;
+        }
+    }
 
     // ==================== TEMPOS DE OPERAÇÃO ====================
 
