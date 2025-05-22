@@ -25,18 +25,18 @@ public class Simulador {
         System.out.println();
         System.out.println(ConsoleCor.AMARELO + "=================== S I M U L A D O R ==================");
         System.out.println();
-
-        System.out.println();
-
         // 1. Cria as 2 estações
+        System.out.println("Criando as 2 estações...");
         EstacaoDeTransferencia estA = new EstacaoDeTransferencia("A");
         EstacaoDeTransferencia estB = new EstacaoDeTransferencia("B");
 
         // 2. Diz ao mapeador quem atende cada conjunto de zonas
+        System.out.println("Mapeando quem atende cada conjunto de zonas");
         MapeadorZonas.configurar(estA, estB);
 
         // 3. Inicializa zonas e gera lixo diário
-        System.out.println("==================== GERANDO ZONAS =====================");
+//        System.out.println("==================== GERANDO ZONAS =====================");
+        System.out.println("Gerando lixo...");
         Lista<Zona> zonas = inicializarZonas();
 
         for (int i = 0; i < zonas.getTamanho(); i++) {
@@ -56,6 +56,7 @@ public class Simulador {
 
 
         // 5. Inicia o processamento da simulação
+        System.out.println();
         System.out.println("Iniciando simulação de coleta de lixo em Teresina\n");
 
         AgendaEventos.processarEventos();
