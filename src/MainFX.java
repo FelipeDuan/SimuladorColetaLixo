@@ -1,5 +1,3 @@
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -10,7 +8,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -18,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 public class MainFX extends Application {
 
     private TextArea logArea;
-    private Timeline timeline;
     private Slider velocidadeSlider;
     private Button iniciarBtn;
     private Button pausarBtn;
@@ -122,6 +118,10 @@ public class MainFX extends Application {
         primaryStage.show();
     }
 
+    private String removerCoresANSI(String texto) {
+        return texto.replaceAll("\u001B\\[[;\\d]*m", "");
+    }
+
     private void iniciarSimulacao() {
         logArea.clear();
         encerrado = false;
@@ -144,7 +144,7 @@ public class MainFX extends Application {
                 while ((linha = reader.readLine()) != null && !encerrado) {
                     while (pausado) Thread.sleep(100);
                     final String linhaFinal = linha;
-                    Platform.runLater(() -> logArea.appendText(linhaFinal + "\n"));
+                    Platform.runLater(() -> logArea.appendText(removerCoresANSI(linhaFinal) + "\n"));
                     Thread.sleep(calcularDelay());
                 }
             } catch (Exception ex) {
