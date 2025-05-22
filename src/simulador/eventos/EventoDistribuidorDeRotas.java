@@ -19,7 +19,7 @@ public class EventoDistribuidorDeRotas {
      * @param viagensPorCaminhao número de viagens que cada caminhão realizará
      * @return lista com todos os caminhões criados
      */
-    public static Lista<CaminhaoPequeno> distribuir(Lista<Zona> zonas, int quantidadeCaminhoes, int viagensPorCaminhao) {
+    public static Lista<CaminhaoPequeno> distribuir(Lista<Zona> zonas, int quantidadeCaminhoes, int viagensPorCaminhao, int capacidadeCaminhao) {
         Lista<CaminhaoPequeno> caminhoes = new Lista<>();
         int quantidadeZonas = zonas.getTamanho();
 
@@ -33,7 +33,7 @@ public class EventoDistribuidorDeRotas {
             }
 
             String id = "C" + (i + 1);
-            int capacidade = 5; // podemos parametrizar isso futuramente
+            int capacidade = capacidadeCaminhao ; // podemos parametrizar isso futuramente
 
             CaminhaoPequeno caminhao = new CaminhaoPequeno(id, capacidade, viagensPorCaminhao, rotaCaminhao);
             caminhoes.adicionar(i, caminhao);

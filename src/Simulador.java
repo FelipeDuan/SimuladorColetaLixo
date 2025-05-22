@@ -37,14 +37,19 @@ public class Simulador {
         }
 
         // 4. Inicializa caminhões e agenda os eventos iniciais
-        Lista<CaminhaoPequeno> caminhoes = EventoDistribuidorDeRotas.distribuir(zonas, 5, 2);
+        Lista<CaminhaoPequeno> caminhoes2t = EventoDistribuidorDeRotas.distribuir(zonas, 5, 5, 2);
+//        Lista<CaminhaoPequeno> caminhoes4t = EventoDistribuidorDeRotas.distribuir(zonas, 5, 5, 4);
+//        Lista<CaminhaoPequeno> caminhoes8t = EventoDistribuidorDeRotas.distribuir(zonas, 5, 5, 8);
 
         // Passando para o mapeador
         MapeadorZonas.setZonas(zonas);
-        MapeadorZonas.setCaminhoes(caminhoes);
+        MapeadorZonas.setCaminhoes(caminhoes2t);
+//        MapeadorZonas.setCaminhoes(caminhoes4t);
+//        MapeadorZonas.setCaminhoes(caminhoes8t);
 
 
         // 5. Inicia o processamento da simulação
+        System.out.println();
         System.out.println(ConsoleCor.AMARELO + "=================== S I M U L A D O R ==================");
         System.out.println("Iniciando simulação de coleta de lixo em Teresina\n");
 
